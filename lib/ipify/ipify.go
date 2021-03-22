@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
+
+	"github.com/bengarrett/myip/lib/geolite2"
 )
 
-const domain = "api.ipxxxify.org"
+const domain = "api.ipify.org"
 
 func Get() error {
 	for i := 1; i <= 3; i++ {
@@ -37,9 +38,16 @@ func get() error {
 	if err != nil {
 		return err
 	}
-	ip = append(ip, []byte("\n")...)
-	if _, err = os.Stdout.Write(ip); err != nil {
-		return err
+	fmt.Printf("%s", string(ip))
+	c, err := geolite2.City(string(ip) + "x")
+	if err != nil {
+		fmt.Println(": City error:", err)
+		return nil
 	}
+	if c != "" {
+		fmt.Printf(" %s", c)
+	}
+	fmt.Println()
+
 	return nil
 }
