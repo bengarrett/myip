@@ -1,14 +1,22 @@
 package geolite2
 
 import (
+	_ "embed"
 	"fmt"
 	"net"
 
 	"github.com/oschwald/maxminddb-golang"
 )
 
+//go:embed db/GeoLite2-Country/GeoLite2-Country.mmdb
+var country []byte
+
+//go:embed db/GeoLite2-City/GeoLite2-City.mmdb
+var city []byte
+
 func Country(ip string) (string, error) {
-	db, err := maxminddb.Open("assets/GeoLite2-Country/GeoLite2-Country.mmdb")
+	// use FromBytes() instead of Open("file.mmdb")
+	db, err := maxminddb.FromBytes(country)
 	if err != nil {
 		return "", err
 	}
@@ -30,7 +38,7 @@ func Country(ip string) (string, error) {
 }
 
 func City(ip string) (string, error) {
-	db, err := maxminddb.Open("assets/GeoLite2-City/GeoLite2-City.mmdb")
+	db, err := maxminddb.FromBytes(city)
 	if err != nil {
 		return "", err
 	}

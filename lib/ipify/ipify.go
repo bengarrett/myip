@@ -39,7 +39,7 @@ func get() error {
 		return err
 	}
 	fmt.Printf("%s", string(ip))
-	c, err := geolite2.City(string(ip) + "x")
+	c, err := geolite2.City(string(ip))
 	if err != nil {
 		fmt.Println(": City error:", err)
 		return nil
