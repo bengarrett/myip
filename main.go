@@ -7,6 +7,7 @@ import (
 	"github.com/bengarrett/myip/lib/ipify"
 	"github.com/bengarrett/myip/lib/myipcom"
 	"github.com/bengarrett/myip/lib/myipio"
+	"github.com/bengarrett/myip/lib/seeip"
 )
 
 type Queries struct {
@@ -32,23 +33,26 @@ func (q *Queries) request3(c chan string) {
 }
 
 func (q *Queries) request4(c chan string) {
-	s := "7.134.10.1"
+	s := seeip.IPv4()
 	q.store(s)
 	c <- s
 }
 
 func (q *Queries) store(ip string) {
+	q.Done++
 	if !contains(q.Results, ip) {
 		q.Results = append(q.Results, ip)
 		c, err := geolite2.City(ip)
-		fmt.Println(err)
+		if err != nil {
+			fmt.Println(err)
+		}
+		//todo handle empty c formatting
 		if len(q.Results) > 1 {
 			q.Print = fmt.Sprintf("%s. %s, %s", q.Print, ip, c)
-			return
+		} else {
+			q.Print = fmt.Sprintf("%s, %s", ip, c)
 		}
-		q.Print = fmt.Sprintf("%s, %s", ip, c)
 	}
-	q.Done++
 	count(q.Done, q.Print)
 }
 
