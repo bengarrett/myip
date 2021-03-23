@@ -59,5 +59,15 @@ func City(ip string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s, %s", record.City.Names["en"], record.Country.Names["en"]), nil
+	ct, co := record.City.Names["en"], record.Country.Names["en"]
+	switch {
+	case ct != "" && co != "":
+		return fmt.Sprintf("%s, %s", ct, co), nil
+	case co != "":
+		return co, nil
+	case ct != "":
+		return ct, nil
+	default:
+		return "", nil
+	}
 }
