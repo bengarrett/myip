@@ -5,6 +5,7 @@ import (
 
 	"github.com/bengarrett/myip/lib/ipify"
 	"github.com/bengarrett/myip/lib/myipcom"
+	"github.com/bengarrett/myip/lib/myipio"
 )
 
 func main() {
@@ -13,5 +14,8 @@ func main() {
 	}
 	if err := myipcom.Get(); err != nil {
 		fmt.Println(err)
+	}
+	if s := myipio.IPv4(); s != "" {
+		fmt.Println(s)
 	}
 }
