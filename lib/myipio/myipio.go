@@ -19,7 +19,7 @@ import (
 // 	"type": "IPv4"
 // }
 
-// Result of
+// Result of IPv4 query.
 type Result struct {
 	Success bool   `json:"success"`
 	IP      string `json:"ip"`
@@ -30,6 +30,7 @@ var result Result
 
 const domain = "api.my-ip.io"
 
+// IPv4 returns the Internet facing IP address of the free my-ip.io service.
 func IPv4() (s string) {
 	var err error
 	for i := 1; i <= 3; i++ {

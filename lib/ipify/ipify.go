@@ -4,50 +4,57 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strings"
-
-	"github.com/bengarrett/myip/lib/geolite2"
 )
+
+// https://api.ipify.org
 
 const domain = "api.ipify.org"
 
-func Get() error {
+// IPv4 returns the Internet facing IP address using the free ipify.org service.
+func IPv4() (s string) {
+	var err error
 	for i := 1; i <= 3; i++ {
-		if err := get(); err != nil {
+		if s, err = get(); err != nil {
 			fmt.Printf("%d. %s: %s\n", i, domain, err)
 			continue
 		}
 		break
 	}
-	return nil
+
+	return s
 }
 
-func get() error {
+func get() (string, error) {
 	res, err := http.Get("https://" + domain)
 	if err != nil {
-		return err
+		return "", err
 	}
-
 	if res.StatusCode != http.StatusOK {
 		StatusErr := errors.New("unusual ipify.org server response")
-		return fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
+		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
+	}
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	ip := string(b)
+	if ok, err := valid(ip); !ok {
+		return ip, err
 	}
 
-	ip, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%s", string(ip))
-	c, err := geolite2.City(string(ip))
-	if err != nil {
-		fmt.Println(": City error:", err)
-		return nil
-	}
-	if c != "" {
-		fmt.Printf(" %s", c)
-	}
-	fmt.Println()
+	return ip, nil
+}
 
-	return nil
+func valid(ip string) (bool, error) {
+	if ip == "" {
+		return false, errors.New("ip address is empty")
+	}
+	if net.ParseIP(ip) == nil {
+		return false, errors.New("ip address is invalid")
+	}
+
+	return true, nil
 }

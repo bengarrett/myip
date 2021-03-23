@@ -9,11 +9,11 @@ import (
 )
 
 func main() {
-	if err := ipify.Get(); err != nil {
-		fmt.Println(err)
+	if s := ipify.IPv4(); s != "" {
+		fmt.Println(s)
 	}
-	if err := myipcom.Get(); err != nil {
-		fmt.Println(err)
+	if s := myipcom.IPv4(); s != "" {
+		fmt.Println(s)
 	}
 	if s := myipio.IPv4(); s != "" {
 		fmt.Println(s)

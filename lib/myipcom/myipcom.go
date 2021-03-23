@@ -5,69 +5,59 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 )
 
-const domain = "api.myip.com"
-
-func Get() error {
-	for i := 1; i <= 3; i++ {
-		if err := get(); err != nil {
-			fmt.Printf("%d. %s: %s\n", i, domain, err)
-			continue
-		}
-		break
-	}
-	return nil
-}
-
-func get() error {
-	res, err := http.Get("https://" + domain)
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		StatusErr := errors.New("unusual myip.com server response")
-		return fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
-	}
-
-	r, err := parse(res.Body)
-	if err != nil {
-		return err
-	}
-	fmt.Println(r.Country)
-
-	// ip, err := ioutil.ReadAll(res.Body)
-	// if err != nil {
-	// 	return err
-	// }
-	// fmt.Printf("%s", string(ip))
-
-	// parse json
-
-	// c, err := geolite2.City(string(ip))
-	// if err != nil {
-	// 	fmt.Println(": City error:", err)
-	// 	return nil
-	// }
-	// if c != "" {
-	// 	fmt.Printf(" %s", c)
-	// }
-	fmt.Println()
-
-	return nil
-}
+// https://api.myip.com
 
 // {"ip":"118.209.50.85","country":"Australia","cc":"AU"}
+
+// Result of IPv4 query.
 type Result struct {
-	IP      string `json:"ip,omitempty" validate:"required"`
+	IP      string `json:"ip"`
 	Country string `json:"country"`
 	ISOCode string `json:"cc"`
 }
 
 var result Result
+
+const domain = "api.myip.com"
+
+// IPv4 returns the Internet facing IP address using the free myip.com service.
+func IPv4() (s string) {
+	var err error
+	for i := 1; i <= 3; i++ {
+		if s, err = get(); err != nil {
+			fmt.Printf("%d. %s: %s\n", i, domain, err)
+			continue
+		}
+		break
+	}
+
+	return s
+}
+
+func get() (string, error) {
+	res, err := http.Get("https://" + domain)
+	if err != nil {
+		return "", err
+	}
+	if res.StatusCode != http.StatusOK {
+		StatusErr := errors.New("unusual myip.com server response")
+		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
+	}
+	r, err := parse(res.Body)
+	if err != nil {
+		return "", err
+	}
+	if ok, err := r.valid(); !ok {
+		return r.IP, err
+	}
+
+	return r.IP, nil
+}
 
 func parse(r io.Reader) (Result, error) {
 	jsonParser := json.NewDecoder(r)
@@ -75,4 +65,15 @@ func parse(r io.Reader) (Result, error) {
 		return Result{}, err
 	}
 	return result, nil
+}
+
+func (r Result) valid() (bool, error) {
+	if r.IP == "" {
+		return false, errors.New("ip address is empty")
+	}
+	if net.ParseIP(r.IP) == nil {
+		return false, errors.New("ip address is invalid")
+	}
+
+	return true, nil
 }
