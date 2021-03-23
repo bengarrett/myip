@@ -9,52 +9,47 @@ import (
 	"github.com/bengarrett/myip/lib/myipio"
 )
 
-var ips []string
-var done int
-var list string
+type Queries struct {
+	Results []string
+	Done    int
+	Print   string
+}
 
-//sort.SearchStrings(a, "A")
-
-func request1(c chan string) {
+func (q *Queries) request1(c chan string) {
 	s := ipify.IPv4()
-	store(s)
-	done++
-	count(done)
+	q.store(s)
 	c <- s
 }
-func request2(c chan string) {
+func (q *Queries) request2(c chan string) {
 	s := myipcom.IPv4()
-	store(s)
-	done++
-	count(done)
+	q.store(s)
 	c <- s
 }
-func request3(c chan string) {
+func (q *Queries) request3(c chan string) {
 	s := myipio.IPv4()
-	store(s)
-	done++
-	count(done)
+	q.store(s)
 	c <- s
 }
 
-func request4(c chan string) {
+func (q *Queries) request4(c chan string) {
 	s := "7.134.10.1"
-	store(s)
-	done++
-	count(done)
+	q.store(s)
 	c <- s
 }
 
-func store(ip string) {
-	if !contains(ips, ip) {
-		ips = append(ips, ip)
-		c, _ := geolite2.City(ip)
-		if len(ips) > 1 {
-			list = fmt.Sprintf("%s. %s, %s", list, ip, c)
+func (q *Queries) store(ip string) {
+	if !contains(q.Results, ip) {
+		q.Results = append(q.Results, ip)
+		c, err := geolite2.City(ip)
+		fmt.Println(err)
+		if len(q.Results) > 1 {
+			q.Print = fmt.Sprintf("%s. %s, %s", q.Print, ip, c)
 			return
 		}
-		list = fmt.Sprintf("%s, %s", ip, c)
+		q.Print = fmt.Sprintf("%s, %s", ip, c)
 	}
+	q.Done++
+	count(q.Done, q.Print)
 }
 
 func contains(a []string, x string) bool {
@@ -66,21 +61,22 @@ func contains(a []string, x string) bool {
 	return false
 }
 
-func count(i int) {
+func count(i int, s string) {
 	if i == 0 {
 		fmt.Print("(0/4) ")
 		return
 	}
-	fmt.Printf("\r(%d/4) %s", i, list)
+	fmt.Printf("\r(%d/4) %s", i, s)
 }
 
 func main() {
-	count(0)
+	var q Queries
+	count(0, "")
 	c := make(chan string)
-	go request1(c)
-	go request2(c)
-	go request3(c)
-	go request4(c)
+	go q.request1(c)
+	go q.request2(c)
+	go q.request3(c)
+	go q.request4(c)
 	_, _, _, _ = <-c, <-c, <-c, <-c
 	fmt.Println()
 	// fmt.Println(z, y, x)
