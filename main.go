@@ -46,10 +46,13 @@ func main() {
 	p.standard()
 }
 
+// Version prints out the program information and version.
 func version() {
 	fmt.Printf("MyIP v%s\n", "0.0")
 }
 
+// Fast waits for the fastest concurrent request to complete
+// then aborts and closes the others.
 func (p ping) fast() {
 	p.count()
 	c := make(chan string)
@@ -62,6 +65,7 @@ func (p ping) fast() {
 	fmt.Println()
 }
 
+// Standard waits for all the concurrent requests to complete.
 func (p ping) standard() {
 	p.count()
 	c := make(chan string)
@@ -73,13 +77,16 @@ func (p ping) standard() {
 	fmt.Println()
 }
 
+// Count prints out the request job counts and the resulting IP addresses.
 func (p ping) count() {
+	// simple prints only the ip addresses
 	if p.mode.simple {
 		if p.complete > 0 {
 			fmt.Printf("\r%s", p.Print)
 		}
 		return
 	}
+	// standard prints the ip addresses with request complete counts
 	total := 4
 	if p.mode.fast {
 		total = 1
@@ -91,28 +98,35 @@ func (p ping) count() {
 	fmt.Printf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
+// Request1 pings ipify.org.
 func (p *ping) request1(c chan string) {
 	s := ipify.IPv4()
 	p.print(s)
 	c <- s
 }
+
+// Request2 pings myip.com.
 func (p *ping) request2(c chan string) {
 	s := myipcom.IPv4()
 	p.print(s)
 	c <- s
 }
+
+// Request3 pings my-ip.io.
 func (p *ping) request3(c chan string) {
 	s := myipio.IPv4()
 	p.print(s)
 	c <- s
 }
 
+// Request4 pings seeip.org.
 func (p *ping) request4(c chan string) {
 	s := seeip.IPv4()
 	p.print(s)
 	c <- s
 }
 
+// Print only unique IP addresses from the request results.
 func (p *ping) print(ip string) {
 	p.complete++
 	if !contains(p.results, ip) {
@@ -126,6 +140,8 @@ func (p *ping) print(ip string) {
 	p.count()
 }
 
+// PrintCity prints the IP address with its geographic location,
+// both the country and the city.
 func (p *ping) printCity(ip string) {
 	c, err := geolite2.City(ip)
 	if err != nil {
@@ -138,6 +154,7 @@ func (p *ping) printCity(ip string) {
 	p.Print = fmt.Sprintf("%s, %s", ip, c)
 }
 
+// PrintSimple prints the IP address.
 func (p *ping) printSimple(ip string) {
 	if len(p.results) > 1 {
 		p.Print = fmt.Sprintf("%s. %s", p.Print, ip)
