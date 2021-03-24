@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/bengarrett/myip/lib/geolite2"
@@ -10,50 +11,139 @@ import (
 	"github.com/bengarrett/myip/lib/seeip"
 )
 
-type Queries struct {
-	Results []string
-	Done    int
-	Print   string
+type ping struct {
+	results  []string
+	complete int
+	Print    string
+	mode     modes
 }
 
-func (q *Queries) request1(c chan string) {
-	s := ipify.IPv4()
-	q.store(s)
-	c <- s
-}
-func (q *Queries) request2(c chan string) {
-	s := myipcom.IPv4()
-	q.store(s)
-	c <- s
-}
-func (q *Queries) request3(c chan string) {
-	s := myipio.IPv4()
-	q.store(s)
-	c <- s
+type modes struct {
+	fast   bool
+	simple bool
 }
 
-func (q *Queries) request4(c chan string) {
-	s := seeip.IPv4()
-	q.store(s)
-	c <- s
+func main() {
+	var p ping
+	flag.BoolVar(&p.mode.simple, "simple", false, "simple mode only displays an IP address and exits")
+	flag.BoolVar(&p.mode.simple, "s", false, "")
+	flag.BoolVar(&p.mode.fast, "fast", false, "fast mode returns the first reported IP address and exits")
+	flag.BoolVar(&p.mode.fast, "f", false, "")
+	ver := flag.Bool("version", false, "version and information for this program")
+	v := flag.Bool("v", false, "")
+	flag.Parse()
+	// version information
+	if *ver || *v {
+		version()
+		return
+	}
+	// fast mode
+	if p.mode.fast {
+		p.fast()
+		return
+	}
+	// standard mode
+	p.standard()
 }
 
-func (q *Queries) store(ip string) {
-	q.Done++
-	if !contains(q.Results, ip) {
-		q.Results = append(q.Results, ip)
-		c, err := geolite2.City(ip)
-		if err != nil {
-			fmt.Println(err)
+func version() {
+	fmt.Printf("MyIP v%s\n", "0.0")
+}
+
+func (p ping) fast() {
+	p.count()
+	c := make(chan string)
+	go p.request1(c)
+	go p.request2(c)
+	go p.request3(c)
+	go p.request4(c)
+	<-c
+	close(c)
+	fmt.Println()
+}
+
+func (p ping) standard() {
+	p.count()
+	c := make(chan string)
+	go p.request1(c)
+	go p.request2(c)
+	go p.request3(c)
+	go p.request4(c)
+	_, _, _, _ = <-c, <-c, <-c, <-c
+	fmt.Println()
+}
+
+func (p ping) count() {
+	if p.mode.simple {
+		if p.complete > 0 {
+			fmt.Printf("\r%s", p.Print)
 		}
-		//todo handle empty c formatting
-		if len(q.Results) > 1 {
-			q.Print = fmt.Sprintf("%s. %s, %s", q.Print, ip, c)
+		return
+	}
+	total := 4
+	if p.mode.fast {
+		total = 1
+	}
+	if p.complete == 0 {
+		fmt.Printf("(0/%d) ", total)
+		return
+	}
+	fmt.Printf("\r(%d/%d) %s", p.complete, total, p.Print)
+}
+
+func (p *ping) request1(c chan string) {
+	s := ipify.IPv4()
+	p.print(s)
+	c <- s
+}
+func (p *ping) request2(c chan string) {
+	s := myipcom.IPv4()
+	p.print(s)
+	c <- s
+}
+func (p *ping) request3(c chan string) {
+	s := myipio.IPv4()
+	p.print(s)
+	c <- s
+}
+
+func (p *ping) request4(c chan string) {
+	s := seeip.IPv4()
+	p.print(s)
+	c <- s
+}
+
+func (p *ping) print(ip string) {
+	p.complete++
+	if !contains(p.results, ip) {
+		p.results = append(p.results, ip)
+		if p.mode.simple {
+			p.printSimple(ip)
 		} else {
-			q.Print = fmt.Sprintf("%s, %s", ip, c)
+			p.printCity(ip)
 		}
 	}
-	count(q.Done, q.Print)
+	p.count()
+}
+
+func (p *ping) printCity(ip string) {
+	c, err := geolite2.City(ip)
+	if err != nil {
+		fmt.Println(err)
+	}
+	if len(p.results) > 1 {
+		p.Print = fmt.Sprintf("%s. %s, %s", p.Print, ip, c)
+		return
+	}
+	p.Print = fmt.Sprintf("%s, %s", ip, c)
+}
+
+func (p *ping) printSimple(ip string) {
+	if len(p.results) > 1 {
+		p.Print = fmt.Sprintf("%s. %s", p.Print, ip)
+		return
+	}
+	p.Print = ip
 }
 
 func contains(a []string, x string) bool {
@@ -63,26 +153,4 @@ func contains(a []string, x string) bool {
 		}
 	}
 	return false
-}
-
-func count(i int, s string) {
-	if i == 0 {
-		fmt.Print("(0/4) ")
-		return
-	}
-	fmt.Printf("\r(%d/4) %s", i, s)
-}
-
-func main() {
-	var q Queries
-	count(0, "")
-	c := make(chan string)
-	go q.request1(c)
-	go q.request2(c)
-	go q.request3(c)
-	go q.request4(c)
-	_, _, _, _ = <-c, <-c, <-c, <-c
-	fmt.Println()
-	// fmt.Println(z, y, x)
-	//fmt.Println(ips)
 }
