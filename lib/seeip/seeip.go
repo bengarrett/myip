@@ -11,7 +11,7 @@ import (
 
 // https://seeip.org
 
-const domain = "ip4.seeip.org"
+var domain = "ip4.seeip.org"
 
 // IPv4 returns the Internet facing IP address using the free seeip.org service.
 func IPv4() (s string) {
