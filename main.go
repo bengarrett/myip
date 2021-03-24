@@ -48,7 +48,10 @@ func main() {
 
 // Version prints out the program information and version.
 func version() {
-	fmt.Printf("MyIP v%s\n", "0.0")
+	const copyright = "\u00A9"
+	const app = "0.0"
+	fmt.Printf("MyIP v%s\n%s 2021 Ben Garrett\n\n", app, copyright)
+	fmt.Println("https://github.com/bengarrett/myip")
 }
 
 // Fast waits for the fastest concurrent request to complete
