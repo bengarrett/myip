@@ -1,6 +1,7 @@
 package myipcom
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"path"
@@ -87,7 +88,7 @@ func TestResult_valid(t *testing.T) {
 				t.Errorf("Result.valid() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("Result.valid() = %v, want %v", got, tt.want)
 			}
 		})

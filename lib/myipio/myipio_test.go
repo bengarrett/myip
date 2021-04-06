@@ -1,6 +1,7 @@
 package myipio
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"path"
@@ -82,7 +83,7 @@ func TestResult_valid(t *testing.T) {
 				Type:    tt.fields.Type,
 			}
 			got, err := r.valid()
-			if err != tt.wantErr {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("Result.valid() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
