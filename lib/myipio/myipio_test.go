@@ -45,10 +45,10 @@ func Test_get(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotS, err := get()
 			if err != nil && tt.wantErr != "" && !strings.Contains(fmt.Sprint(err), tt.wantErr) {
-				t.Errorf("IPv4() error = %v, want %v", err, tt.wantErr)
+				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
 			}
 			if bool(gotS != "") != tt.isValid {
-				t.Errorf("IPv4() = %v, want an ip addr: %v", gotS, tt.isValid)
+				t.Errorf("get() = %v, want an ip addr: %v", gotS, tt.isValid)
 			}
 		})
 	}
