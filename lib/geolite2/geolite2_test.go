@@ -17,6 +17,7 @@ func BenchmarkCountry(b *testing.B) {
 	}
 	fmt.Println(s)
 }
+
 func BenchmarkCity(b *testing.B) {
 	s, err := City(example)
 	if err != nil {

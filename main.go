@@ -111,7 +111,7 @@ func (p ping) count() {
 		fmt.Printf("(0/%d) ", total)
 		return
 	}
-	// (1/4) 1.1.1.1, Silicon Valley, United States
+	// (1/4) 93.184.216.34, Norwell, United States
 	fmt.Printf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
