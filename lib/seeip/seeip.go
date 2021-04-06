@@ -10,8 +10,15 @@ import (
 )
 
 // https://seeip.org
+//
+// Output:
+// {"ip":"1.1.1.1"}
 
-var domain = "ip4.seeip.org"
+var (
+	domain     = "ip4.seeip.org"
+	ErrNoIP    = errors.New("ip address is empty")
+	ErrInvalid = errors.New("ip address is invalid")
+)
 
 // IPv4 returns the Internet facing IP address using the free seeip.org service.
 func IPv4() (s string) {
@@ -50,10 +57,10 @@ func get() (string, error) {
 
 func valid(ip string) (bool, error) {
 	if ip == "" {
-		return false, errors.New("ip address is empty")
+		return false, ErrNoIP
 	}
 	if net.ParseIP(ip) == nil {
-		return false, errors.New("ip address is invalid")
+		return false, ErrInvalid
 	}
 
 	return true, nil

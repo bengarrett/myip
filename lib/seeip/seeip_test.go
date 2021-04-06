@@ -1,6 +1,7 @@
 package seeip
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -12,6 +13,33 @@ func BenchmarkGet(b *testing.B) {
 		return
 	}
 	fmt.Println(s)
+}
+
+func TestIPv4(t *testing.T) {
+	tests := []struct {
+		name    string
+		domain  string
+		isValid bool
+		wantErr error
+	}{
+		{"empty", "", false, ErrNoIP},
+		{"html", "example.com", false, ErrInvalid},
+		{"404", "ip4.seeip.org/abcdef", false, ErrNoIP},
+		{"okay", "ip4.seeip.org", true, nil},
+	}
+	for _, tt := range tests {
+		domain = tt.domain
+		t.Run(tt.name, func(t *testing.T) {
+			gotS := IPv4()
+			gotV, err := valid(gotS)
+			if err != nil && !errors.Is(err, tt.wantErr) {
+				t.Errorf("IPv4() error = %v, want %v", err, tt.wantErr)
+			}
+			if gotV != tt.isValid {
+				t.Errorf("IPv4() = %v, want %v", gotS, tt.isValid)
+			}
+		})
+	}
 }
 
 func Test_valid(t *testing.T) {
@@ -38,33 +66,6 @@ func Test_valid(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("valid() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestIPv4(t *testing.T) {
-	tests := []struct {
-		name    string
-		domain  string
-		isValid bool
-		wantErr string
-	}{
-		{"empty", "", false, "ip address is empty"},
-		{"html", "example.com", false, "ip address is invalid"},
-		{"404", "ip4.seeip.org/abcdef", false, "ip address is empty"},
-		{"okay", "ip4.seeip.org", true, ""},
-	}
-	for _, tt := range tests {
-		domain = tt.domain
-		t.Run(tt.name, func(t *testing.T) {
-			gotS := IPv4()
-			gotV, err := valid(gotS)
-			if err != nil && tt.wantErr != "" && fmt.Sprint(err) != tt.wantErr {
-				t.Errorf("IPv4() error = %v, want %v", err, tt.wantErr)
-			}
-			if gotV != tt.isValid {
-				t.Errorf("IPv4() = %v, want %v", gotS, tt.isValid)
 			}
 		})
 	}
