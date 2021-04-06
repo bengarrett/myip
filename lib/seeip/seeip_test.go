@@ -23,7 +23,7 @@ func TestIPv4(t *testing.T) {
 		wantErr error
 	}{
 		{"empty", "", false, ErrNoIP},
-		{"html", "example.com", false, ErrInvalid},
+		{"html", "example.com", false, ErrNoIP},
 		{"404", "ip4.seeip.org/abcdef", false, ErrNoIP},
 		{"okay", "ip4.seeip.org", true, nil},
 	}

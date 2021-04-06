@@ -206,7 +206,7 @@ func Test_ping_parse(t *testing.T) {
 		ip     string
 		want   string
 	}{
-		{"empty", fields{}, "", "city error: IP passed to Lookup cannot be nil\n"},
+		{"empty", fields{}, "", ""},
 		{"ip", fields{}, example, fmt.Sprintf("\r(1/4) %s", norwell)},
 	}
 	for _, tt := range tests {
