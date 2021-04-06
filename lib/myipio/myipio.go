@@ -28,11 +28,8 @@ type Result struct {
 }
 
 var (
-	result Result
-	domain = "api.my-ip.io"
-)
-
-var (
+	result       Result
+	domain       = "api.my-ip.io"
 	ErrNoIP      = errors.New("ip address is empty")
 	ErrNoSuccess = errors.New("ip address is unsuccessful")
 	ErrNoIPv4    = errors.New("ip address is not ipv4")
