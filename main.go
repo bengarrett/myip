@@ -157,7 +157,7 @@ func (p *ping) parse(ip string) string {
 		var err error
 		p.Print, err = p.city(ip)
 		if err != nil {
-			return fmt.Sprintf("city error: %s\n", err)
+			return fmt.Sprintf("city %q error: %s\n", ip, err)
 		}
 	}
 	return p.count()

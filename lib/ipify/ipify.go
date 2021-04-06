@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
+	"time"
 )
 
 // https://api.ipify.org
@@ -15,33 +17,41 @@ import (
 // 1.1.1.1
 
 var (
-	domain     = "api.ipify.org"
-	ErrNoIP    = errors.New("ip address is empty")
-	ErrInvalid = errors.New("ip address is invalid")
+	domain                   = "api.ipify.org"
+	ErrNoIP                  = errors.New("ip address is empty")
+	ErrInvalid               = errors.New("ip address is invalid")
+	ErrStatus                = errors.New("unusual ipify.org server response")
+	Timeout    time.Duration = 5
 )
 
 // IPv4 returns the Internet facing IP address using the free ipify.org service.
-func IPv4() (s string) {
-	var err error
-	for i := 1; i <= 3; i++ {
-		if s, err = get(); err != nil {
-			fmt.Printf("%d. %s: %s\n", i, domain, err)
-			continue
+func IPv4() string {
+	s, err := get()
+	if err != nil {
+		if _, ok := err.(*url.Error); ok {
+			if strings.Contains(err.Error(), "context deadline exceeded") {
+				fmt.Printf("\n%s: timeout\n", domain)
+				return ""
+			}
+			fmt.Printf("\n%s: %s\n", domain, err)
 		}
-		break
+		return ""
 	}
 
 	return s
 }
 
 func get() (string, error) {
-	res, err := http.Get("https://" + domain)
+	c := &http.Client{
+		Timeout: Timeout * time.Second,
+	}
+	res, err := c.Get("https://" + domain)
 	if err != nil {
 		return "", err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		StatusErr := errors.New("unusual ipify.org server response")
-		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
+		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), ErrStatus)
 	}
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {

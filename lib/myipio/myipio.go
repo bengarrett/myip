@@ -7,8 +7,10 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
+	"time"
 )
 
 // https://api.my-ip.io/ip.json
@@ -29,38 +31,45 @@ type Result struct {
 
 var (
 	result       Result
-	domain       = "api.my-ip.io"
-	ErrNoIP      = errors.New("ip address is empty")
-	ErrNoSuccess = errors.New("ip address is unsuccessful")
-	ErrNoIPv4    = errors.New("ip address is not ipv4")
-	ErrInvalid   = errors.New("ip address is invalid")
+	domain                     = "api.my-ip.io"
+	ErrNoIP                    = errors.New("ip address is empty")
+	ErrNoSuccess               = errors.New("ip address is unsuccessful")
+	ErrNoIPv4                  = errors.New("ip address is not ipv4")
+	ErrInvalid                 = errors.New("ip address is invalid")
+	Timeout      time.Duration = 5
 )
 
 // IPv4 returns the Internet facing IP address of the free my-ip.io service.
-func IPv4() (s string) {
-	var err error
-	for i := 1; i <= 3; i++ {
-		s, err = get()
-		if err != nil {
-			fmt.Printf("%d. %s: %s\n", i, domain, err)
-			continue
+func IPv4() string {
+	s, err := get()
+	if err != nil {
+		if _, ok := err.(*url.Error); ok {
+			if strings.Contains(err.Error(), "context deadline exceeded") {
+				fmt.Printf("\n%s: timeout\n", domain)
+				return ""
+			}
+			fmt.Printf("\n%s: %s\n", domain, err)
 		}
-		break
+		return ""
 	}
 
 	return s
 }
 
 func get() (string, error) {
-	resp, err := http.Get("https://" + path.Join(domain, "ip.json"))
+	c := &http.Client{
+		Timeout: Timeout * time.Second,
+	}
+	res, err := c.Get("https://" + path.Join(domain, "ip.json"))
 	if err != nil {
 		return "", err
 	}
-	if resp.StatusCode != http.StatusOK {
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
 		StatusErr := errors.New("unusual my-ip.io server response")
-		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), StatusErr)
+		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
 	}
-	r, err := parse(resp.Body)
+	r, err := parse(res.Body)
 	if err != nil {
 		return "", err
 	}
