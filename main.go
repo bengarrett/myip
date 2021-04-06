@@ -70,7 +70,7 @@ func version() {
 // Fast waits for the fastest concurrent request to complete
 // before aborting and closing the others.
 func (p ping) first() {
-	p.count()
+	fmt.Print(p.count())
 	c := make(chan string)
 	go p.request1(c)
 	go p.request2(c)
@@ -83,7 +83,7 @@ func (p ping) first() {
 
 // Standard waits for all the concurrent requests to complete.
 func (p ping) standard() {
-	p.count()
+	fmt.Print(p.count())
 	c := make(chan string)
 	go p.request1(c)
 	go p.request2(c)
@@ -94,13 +94,13 @@ func (p ping) standard() {
 }
 
 // Count prints out the request job counts and the resulting IP addresses.
-func (p ping) count() {
+func (p ping) count() string {
 	// simple prints only the ip addresses
 	if p.mode.simple {
 		if p.complete > 0 {
-			fmt.Printf("\r%s", p.Print)
+			return fmt.Sprintf("\r%s", p.Print)
 		}
-		return
+		return ""
 	}
 	// standard prints the ip addresses with request complete counts
 	total := 4
@@ -108,76 +108,77 @@ func (p ping) count() {
 		total = 1
 	}
 	if p.complete == 0 {
-		fmt.Printf("(0/%d) ", total)
-		return
+		return fmt.Sprintf("(0/%d) ", total)
 	}
 	// (1/4) 93.184.216.34, Norwell, United States
-	fmt.Printf("\r(%d/%d) %s", p.complete, total, p.Print)
+	return fmt.Sprintf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
 // Request1 pings ipify.org.
 func (p *ping) request1(c chan string) {
 	s := ipify.IPv4()
-	p.print(s)
+	fmt.Print(p.parse(s))
 	c <- s
 }
 
 // Request2 pings myip.com.
 func (p *ping) request2(c chan string) {
 	s := myipcom.IPv4()
-	p.print(s)
+	fmt.Print(p.parse(s))
 	c <- s
 }
 
 // Request3 pings my-ip.io.
 func (p *ping) request3(c chan string) {
 	s := myipio.IPv4()
-	p.print(s)
+	fmt.Print(p.parse(s))
 	c <- s
 }
 
 // Request4 pings seeip.org.
 func (p *ping) request4(c chan string) {
 	s := seeip.IPv4()
-	p.print(s)
+	fmt.Print(p.parse(s))
 	c <- s
 }
 
 // Print only unique IP addresses from the request results.
-func (p *ping) print(ip string) {
+func (p *ping) parse(ip string) string {
 	p.complete++
 	if !contains(p.results, ip) {
 		p.results = append(p.results, ip)
 		if p.mode.simple {
-			p.printSimple(ip)
-		} else {
-			p.printCity(ip)
+			p.Print = p.simple(ip)
+			return p.count()
+		}
+		var err error
+		p.Print, err = p.city(ip)
+		if err != nil {
+			return fmt.Sprintf("city error: %s\n", err)
 		}
 	}
-	p.count()
+	return p.count()
 }
 
-// PrintCity prints the IP address with its geographic location,
+// City prints the IP address with its geographic location,
 // both the country and the city.
-func (p *ping) printCity(ip string) {
+func (p ping) city(ip string) (string, error) {
 	c, err := geolite2.City(ip)
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 	if len(p.results) > 1 {
-		p.Print = fmt.Sprintf("%s. %s, %s", p.Print, ip, c)
-		return
+		return fmt.Sprintf("%s. %s, %s", p.Print, ip, c), nil
 	}
-	p.Print = fmt.Sprintf("%s, %s", ip, c)
+	return fmt.Sprintf("%s, %s", ip, c), nil
 }
 
 // PrintSimple prints the IP address.
-func (p *ping) printSimple(ip string) {
+func (p ping) simple(ip string) string {
 	if len(p.results) > 1 {
-		p.Print = fmt.Sprintf("%s. %s", p.Print, ip)
-		return
+		return fmt.Sprintf("%s. %s", p.Print, ip)
 	}
-	p.Print = ip
+	return ip
 }
 
 func contains(a []string, x string) bool {
