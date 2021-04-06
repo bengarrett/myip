@@ -6,7 +6,7 @@ import (
 )
 
 func BenchmarkGet(b *testing.B) {
-	s, err := get()
+	s, err := get(domain)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -27,9 +27,9 @@ func TestIPv4(t *testing.T) {
 		{"okay", "ip4.seeip.org", true, false},
 	}
 	for _, tt := range tests {
-		domain = tt.domain
+		d := tt.domain
 		t.Run(tt.name, func(t *testing.T) {
-			gotS, err := get()
+			gotS, err := get(d)
 			if bool(err != nil) != tt.wantErr {
 				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
 			}

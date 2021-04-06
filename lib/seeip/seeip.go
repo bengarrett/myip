@@ -19,16 +19,18 @@ import (
 // {"ip":"1.1.1.1"}
 
 var (
-	domain     = "ip4.seeip.org"
 	ErrNoIP    = errors.New("ip address is empty")
 	ErrInvalid = errors.New("ip address is invalid")
 )
 
-const timeout time.Duration = 5
+const (
+	domain                = "ip4.seeip.org"
+	timeout time.Duration = 5
+)
 
 // IPv4 returns the Internet facing IP address using the free seeip.org service.
 func IPv4() (s string) {
-	s, err := get()
+	s, err := get(domain)
 	if err != nil {
 		if _, ok := err.(*url.Error); ok {
 			if strings.Contains(err.Error(), "context deadline exceeded") {
@@ -44,12 +46,12 @@ func IPv4() (s string) {
 	return s
 }
 
-func get() (string, error) {
+func get(d string) (string, error) {
 	c := &http.Client{
 		Timeout: timeout * time.Second,
 	}
 	ctx := context.Background()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+domain, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+d, nil)
 	if err != nil {
 		return "", err
 	}

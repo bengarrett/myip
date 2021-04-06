@@ -32,26 +32,28 @@ type Result struct {
 }
 
 var (
-	result       Result
-	domain       = "api.my-ip.io"
 	ErrNoIP      = errors.New("ip address is empty")
 	ErrNoSuccess = errors.New("ip address is unsuccessful")
 	ErrNoIPv4    = errors.New("ip address is not ipv4")
 	ErrInvalid   = errors.New("ip address is invalid")
 )
 
-const timeout time.Duration = 5
+const (
+	domain                = "api.my-ip.io"
+	timeout time.Duration = 5
+)
 
 // IPv4 returns the Internet facing IP address of the free my-ip.io service.
 func IPv4() string {
-	s, err := get()
+	d := domain
+	s, err := get(d)
 	if err != nil {
 		if _, ok := err.(*url.Error); ok {
 			if strings.Contains(err.Error(), "context deadline exceeded") {
-				fmt.Printf("\n%s: timeout\n", domain)
+				fmt.Printf("\n%s: timeout\n", d)
 				return ""
 			}
-			fmt.Printf("\n%s: %s\n", domain, err)
+			fmt.Printf("\n%s: %s\n", d, err)
 			return ""
 		}
 		log.Fatalln(err)
@@ -60,12 +62,12 @@ func IPv4() string {
 	return s
 }
 
-func get() (string, error) {
+func get(d string) (string, error) {
 	c := &http.Client{
 		Timeout: timeout * time.Second,
 	}
 	ctx := context.Background()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+path.Join(domain, "ip.json"), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+path.Join(d, "ip.json"), nil)
 	if err != nil {
 		return "", err
 	}
@@ -90,6 +92,7 @@ func get() (string, error) {
 }
 
 func parse(r io.Reader) (Result, error) {
+	var result Result
 	jsonParser := json.NewDecoder(r)
 	if err := jsonParser.Decode(&result); err != nil {
 		return Result{}, err

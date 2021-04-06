@@ -10,7 +10,7 @@ import (
 )
 
 func BenchmarkGet(b *testing.B) {
-	s, err := get()
+	s, err := get(domain)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -19,7 +19,7 @@ func BenchmarkGet(b *testing.B) {
 }
 
 func TestIPv4(t *testing.T) {
-	wantS, _ := get()
+	wantS, _ := get(domain)
 	if gotS := IPv4(); gotS != wantS {
 		t.Errorf("IPv4() = %v, want %v", gotS, wantS)
 	}
@@ -42,9 +42,9 @@ func Test_get(t *testing.T) {
 		{"okay", domain, true, ""},
 	}
 	for _, tt := range tests {
-		domain = tt.domain
+		d := tt.domain
 		t.Run(tt.name, func(t *testing.T) {
-			gotS, err := get()
+			gotS, err := get(d)
 			if err != nil && tt.wantErr != "" && !strings.Contains(fmt.Sprint(err), tt.wantErr) {
 				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
 			}
