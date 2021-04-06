@@ -2,6 +2,8 @@ package myipio
 
 import (
 	"fmt"
+	"net/url"
+	"path"
 	"strings"
 	"testing"
 )
@@ -23,6 +25,10 @@ func TestIPv4(t *testing.T) {
 }
 
 func Test_get(t *testing.T) {
+	u, err := url.Parse(domain)
+	if err != nil {
+		t.Errorf("failed to parse domain %q, %s", domain, err)
+	}
 	tests := []struct {
 		name    string
 		domain  string
@@ -31,8 +37,8 @@ func Test_get(t *testing.T) {
 	}{
 		{"empty", "", false, "no such host"},
 		{"html", "example.com", false, "404 not found"},
-		{"404", "api.my-ip.io/abcdef", false, "404 not found"},
-		{"okay", "api.my-ip.io", true, ""},
+		{"404", path.Join(u.Path, "abcdef"), false, "404 not found"},
+		{"okay", domain, true, ""},
 	}
 	for _, tt := range tests {
 		domain = tt.domain
