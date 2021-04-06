@@ -96,7 +96,7 @@ func (r Result) valid() (bool, error) {
 	if !r.Success {
 		return false, ErrNoSuccess
 	}
-	if strings.ToLower(r.Type) != "ipv4" {
+	if !strings.EqualFold(r.Type, "ipv4") {
 		return false, ErrNoIPv4
 	}
 	if net.ParseIP(r.IP) == nil {

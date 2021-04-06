@@ -6,6 +6,13 @@ import (
 	"testing"
 )
 
+type jobs uint8
+
+const (
+	cities jobs = iota
+	countries
+)
+
 // example.com
 const example = "93.184.216.34"
 
@@ -27,51 +34,37 @@ func BenchmarkCity(b *testing.B) {
 	fmt.Println(s)
 }
 
-func TestCountry(t *testing.T) {
+func TestLocations(t *testing.T) {
 	tests := []struct {
 		name    string
+		job     jobs
 		ip      string
 		want    string
 		wantErr bool
 	}{
-		{"empty", "", "", true},
-		{"invalid", "1.1.1", "", true},
-		{"valid", example, "United States", false},
+		{"empty country", countries, "", "", true},
+		{"invalid country", countries, "1.1.1", "", true},
+		{"valid country", countries, example, "United States", false},
+		{"empty city", cities, "", "", true},
+		{"invalid city", cities, "1.1.1", "", true},
+		{"valid city", cities, example, "Norwell, United States", false},
 	}
+	var got string
+	var err error
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Country(tt.ip)
+			switch tt.job {
+			case cities:
+				got, err = City(tt.ip)
+			case countries:
+				got, err = Country(tt.ip)
+			}
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Country() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Locations() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Country() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestCity(t *testing.T) {
-	tests := []struct {
-		name    string
-		ip      string
-		want    string
-		wantErr bool
-	}{
-		{"empty", "", "", true},
-		{"invalid", "1.1.1", "", true},
-		{"valid", example, "Norwell, United States", false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := City(tt.ip)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("City() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("City() = %v, want %v", got, tt.want)
+				t.Errorf("Locations() = %v, want %v", got, tt.want)
 			}
 		})
 	}

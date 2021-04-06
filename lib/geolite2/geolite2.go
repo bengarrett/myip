@@ -1,6 +1,7 @@
 package geolite2
 
 import (
+	// Embed GeoLite2 databases
 	_ "embed"
 	"fmt"
 	"net"

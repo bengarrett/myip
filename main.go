@@ -98,7 +98,10 @@ func (p ping) standard() {
 	go p.worker(job2, c)
 	go p.worker(job3, c)
 	go p.worker(job4, c)
-	_, _, _, _ = <-c, <-c, <-c, <-c
+	<-c
+	<-c
+	<-c
+	<-c
 	fmt.Println()
 }
 
