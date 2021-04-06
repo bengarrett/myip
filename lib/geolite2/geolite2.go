@@ -8,6 +8,8 @@ import (
 	"github.com/oschwald/maxminddb-golang"
 )
 
+const lang = "en"
+
 //go:embed db/GeoLite2-Country/GeoLite2-Country.mmdb
 var country []byte
 
@@ -34,7 +36,7 @@ func Country(ip string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return record.Country.Names["en"], nil
+	return record.Country.Names[lang], nil
 }
 
 func City(ip string) (string, error) {
@@ -59,7 +61,7 @@ func City(ip string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	ct, co := record.City.Names["en"], record.Country.Names["en"]
+	ct, co := record.City.Names[lang], record.Country.Names[lang]
 	switch {
 	case ct != "" && co != "":
 		return fmt.Sprintf("%s, %s", ct, co), nil
