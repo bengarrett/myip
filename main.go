@@ -48,7 +48,7 @@ func main() {
 func self() (string, error) {
 	exe, err := os.Executable()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("self error: %w", err)
 	}
 	return filepath.Dir(exe), nil
 }
@@ -61,14 +61,14 @@ func version() {
 	fmt.Println("Web:  https://github.com/bengarrett/myip")
 	exe, err := self()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Path: %s\n", err)
 		return
 	}
 	fmt.Printf("Path: %s\n", exe)
 }
 
 // Fast waits for the fastest concurrent request to complete
-// then aborts and closes the others.
+// before aborting and closing the others.
 func (p ping) first() {
 	p.count()
 	c := make(chan string)
@@ -111,6 +111,7 @@ func (p ping) count() {
 		fmt.Printf("(0/%d) ", total)
 		return
 	}
+	// (1/4) 1.1.1.1, Silicon Valley, United States
 	fmt.Printf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
