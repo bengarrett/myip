@@ -11,23 +11,27 @@ const (
 	norwell = "93.184.216.34, Norwell, United States"
 )
 
+//nolint:unparam
 func BenchmarkStd(b *testing.B) {
 	var p ping
 	p.standard()
 }
 
+//nolint:unparam
 func BenchmarkFirst(b *testing.B) {
 	var p ping
 	p.mode.first = true
 	p.first()
 }
 
+//nolint:unparam
 func BenchmarkSimple(b *testing.B) {
 	var p ping
 	p.mode.simple = true
 	p.standard()
 }
 
+//nolint:unparam
 func BenchmarkSimpleAndFirst(b *testing.B) {
 	var p ping
 	p.mode.first = true
