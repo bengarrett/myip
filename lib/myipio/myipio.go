@@ -12,10 +12,11 @@ import (
 )
 
 // https://api.my-ip.io/ip.json
-
+//
+// Output:
 // {
 // 	"success": true,
-// 	"ip": "165.227.66.230",
+// 	"ip": "100.100.0.0",
 // 	"type": "IPv4"
 // }
 
@@ -29,6 +30,13 @@ type Result struct {
 var (
 	result Result
 	domain = "api.my-ip.io"
+)
+
+var (
+	ErrNoIP      = errors.New("ip address is empty")
+	ErrNoSuccess = errors.New("ip address is unsuccessful")
+	ErrNoIPv4    = errors.New("ip address is not ipv4")
+	ErrInvalid   = errors.New("ip address is invalid")
 )
 
 // IPv4 returns the Internet facing IP address of the free my-ip.io service.
@@ -77,16 +85,16 @@ func parse(r io.Reader) (Result, error) {
 
 func (r Result) valid() (bool, error) {
 	if r.IP == "" {
-		return false, errors.New("ip address is empty")
+		return false, ErrNoIP
 	}
 	if !r.Success {
-		return false, errors.New("ip address is unsuccessful")
+		return false, ErrNoSuccess
 	}
 	if strings.ToLower(r.Type) != "ipv4" {
-		return false, errors.New("ip address is not ipv4")
+		return false, ErrNoIPv4
 	}
 	if net.ParseIP(r.IP) == nil {
-		return false, errors.New("ip address is invalid")
+		return false, ErrInvalid
 	}
 
 	return true, nil
