@@ -145,6 +145,9 @@ func (p *ping) request4(c chan string) {
 // Print only unique IP addresses from the request results.
 func (p *ping) parse(ip string) string {
 	p.complete++
+	if ip == "" {
+		return ""
+	}
 	if !contains(p.results, ip) {
 		p.results = append(p.results, ip)
 		if p.mode.simple {
