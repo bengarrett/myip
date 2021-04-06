@@ -1,7 +1,6 @@
 package seeip
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 )
@@ -20,23 +19,23 @@ func TestIPv4(t *testing.T) {
 		name    string
 		domain  string
 		isValid bool
-		wantErr error
+		wantErr bool
 	}{
-		{"empty", "", false, ErrNoIP},
-		{"html", "example.com", false, ErrNoIP},
-		{"404", "ip4.seeip.org/abcdef", false, ErrNoIP},
-		{"okay", "ip4.seeip.org", true, nil},
+		{"empty", "", false, true},
+		{"html", "example.com", false, true},
+		{"404", "ip4.seeip.org/abcdef", false, true},
+		{"okay", "ip4.seeip.org", true, false},
 	}
 	for _, tt := range tests {
 		domain = tt.domain
 		t.Run(tt.name, func(t *testing.T) {
-			gotS := IPv4()
-			gotV, err := valid(gotS)
-			if err != nil && !errors.Is(err, tt.wantErr) {
-				t.Errorf("IPv4() error = %v, want %v", err, tt.wantErr)
+			gotS, err := get()
+			if bool(err != nil) != tt.wantErr {
+				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
 			}
+			gotV, _ := valid(gotS)
 			if gotV != tt.isValid {
-				t.Errorf("IPv4() = %v, want %v", gotS, tt.isValid)
+				t.Errorf("get() = %v, want %v", gotS, tt.isValid)
 			}
 		})
 	}
