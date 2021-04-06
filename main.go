@@ -45,12 +45,12 @@ func main() {
 	p.standard()
 }
 
-func self() (error, string) {
+func self() (string, error) {
 	exe, err := os.Executable()
 	if err != nil {
-		return err, ""
+		return "", err
 	}
-	return nil, filepath.Dir(exe)
+	return filepath.Dir(exe), nil
 }
 
 // Version prints out the program information and version.
@@ -58,13 +58,13 @@ func version() {
 	const copyright = "\u00A9"
 	const app = "0.0"
 	fmt.Printf("MyIP v%s\n%s 2021 Ben Garrett\n\n", app, copyright)
-	fmt.Println("https://github.com/bengarrett/myip")
-	err, exe := self()
+	fmt.Println("Web:  https://github.com/bengarrett/myip")
+	exe, err := self()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("\nprogram path: %s\n", exe)
+	fmt.Printf("Path: %s\n", exe)
 }
 
 // Fast waits for the fastest concurrent request to complete
