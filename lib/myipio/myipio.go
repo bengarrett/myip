@@ -26,9 +26,10 @@ type Result struct {
 	Type    string `json:"type"`
 }
 
-var result Result
-
-const domain = "api.my-ip.io"
+var (
+	result Result
+	domain = "api.my-ip.io"
+)
 
 // IPv4 returns the Internet facing IP address of the free my-ip.io service.
 func IPv4() (s string) {
