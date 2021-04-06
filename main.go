@@ -72,10 +72,10 @@ func version() {
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	go p.request1(c)
-	go p.request2(c)
-	go p.request3(c)
-	go p.request4(c)
+	go p.worker(1, c)
+	go p.worker(2, c)
+	go p.worker(3, c)
+	go p.worker(4, c)
 	<-c
 	close(c)
 	fmt.Println()
@@ -85,10 +85,10 @@ func (p ping) first() {
 func (p ping) standard() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	go p.request1(c)
-	go p.request2(c)
-	go p.request3(c)
-	go p.request4(c)
+	go p.worker(1, c)
+	go p.worker(2, c)
+	go p.worker(3, c)
+	go p.worker(4, c)
 	_, _, _, _ = <-c, <-c, <-c, <-c
 	fmt.Println()
 }
@@ -114,30 +114,18 @@ func (p ping) count() string {
 	return fmt.Sprintf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
-// Request1 pings ipify.org.
-func (p *ping) request1(c chan string) {
-	s := ipify.IPv4()
-	fmt.Print(p.parse(s))
-	c <- s
-}
-
-// Request2 pings myip.com.
-func (p *ping) request2(c chan string) {
-	s := myipcom.IPv4()
-	fmt.Print(p.parse(s))
-	c <- s
-}
-
-// Request3 pings my-ip.io.
-func (p *ping) request3(c chan string) {
-	s := myipio.IPv4()
-	fmt.Print(p.parse(s))
-	c <- s
-}
-
-// Request4 pings seeip.org.
-func (p *ping) request4(c chan string) {
-	s := seeip.IPv4()
+func (p *ping) worker(i int, c chan string) {
+	var s string
+	switch i {
+	case 1:
+		s = ipify.IPv4()
+	case 2:
+		s = myipcom.IPv4()
+	case 3:
+		s = myipio.IPv4()
+	case 4:
+		s = seeip.IPv4()
+	}
 	fmt.Print(p.parse(s))
 	c <- s
 }
