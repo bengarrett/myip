@@ -1,9 +1,11 @@
 package seeip
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -33,8 +35,9 @@ func IPv4() (s string) {
 				return ""
 			}
 			fmt.Printf("\n%s: %s\n", domain, err)
+			return ""
 		}
-		return ""
+		log.Fatalln(err)
 	}
 
 	return s
@@ -44,16 +47,21 @@ func get() (string, error) {
 	c := &http.Client{
 		Timeout: Timeout * time.Second,
 	}
-	res, err := c.Get("https://" + domain)
+	ctx := context.Background()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+domain, nil)
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		StatusErr := errors.New("unusual seeip.org server response")
-		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
+	resp, err := c.Do(req)
+	if err != nil {
+		return "", err
 	}
-	b, err := ioutil.ReadAll(res.Body)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		StatusErr := errors.New("unusual seeip.org server response")
+		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), StatusErr)
+	}
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}

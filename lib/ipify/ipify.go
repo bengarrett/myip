@@ -1,9 +1,11 @@
 package ipify
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -34,8 +36,9 @@ func IPv4() string {
 				return ""
 			}
 			fmt.Printf("\n%s: %s\n", domain, err)
+			return ""
 		}
-		return ""
+		log.Fatalln(err)
 	}
 
 	return s
@@ -45,7 +48,12 @@ func get() (string, error) {
 	c := &http.Client{
 		Timeout: Timeout * time.Second,
 	}
-	resp, err := c.Get("https://" + domain)
+	ctx := context.Background()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+domain, nil)
+	if err != nil {
+		return "", err
+	}
+	resp, err := c.Do(req)
 	if err != nil {
 		return "", err
 	}

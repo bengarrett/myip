@@ -1,10 +1,12 @@
 package myipcom
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -42,8 +44,9 @@ func IPv4() string {
 				return ""
 			}
 			fmt.Printf("\n%s: %s\n", domain, err)
+			return ""
 		}
-		return ""
+		log.Fatalln(err)
 	}
 
 	return s
@@ -53,16 +56,21 @@ func get() (string, error) {
 	c := &http.Client{
 		Timeout: Timeout * time.Second,
 	}
-	res, err := c.Get("https://" + domain)
+	ctx := context.Background()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+domain, nil)
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		StatusErr := errors.New("unusual myip.com server response")
-		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), StatusErr)
+	resp, err := c.Do(req)
+	if err != nil {
+		return "", err
 	}
-	r, err := parse(res.Body)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		StatusErr := errors.New("unusual myip.com server response")
+		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), StatusErr)
+	}
+	r, err := parse(resp.Body)
 	if err != nil {
 		return "", err
 	}
