@@ -19,12 +19,13 @@ import (
 // 1.1.1.1
 
 var (
-	domain                   = "api.ipify.org"
-	ErrNoIP                  = errors.New("ip address is empty")
-	ErrInvalid               = errors.New("ip address is invalid")
-	ErrStatus                = errors.New("unusual ipify.org server response")
-	Timeout    time.Duration = 5
+	domain     = "api.ipify.org"
+	ErrNoIP    = errors.New("ip address is empty")
+	ErrInvalid = errors.New("ip address is invalid")
+	ErrStatus  = errors.New("unusual ipify.org server response")
 )
+
+const timeout time.Duration = 5
 
 // IPv4 returns the Internet facing IP address using the free ipify.org service.
 func IPv4() string {
@@ -46,7 +47,7 @@ func IPv4() string {
 
 func get() (string, error) {
 	c := &http.Client{
-		Timeout: Timeout * time.Second,
+		Timeout: timeout * time.Second,
 	}
 	ctx := context.Background()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+domain, nil)

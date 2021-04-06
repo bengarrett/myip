@@ -33,13 +33,14 @@ type Result struct {
 
 var (
 	result       Result
-	domain                     = "api.my-ip.io"
-	ErrNoIP                    = errors.New("ip address is empty")
-	ErrNoSuccess               = errors.New("ip address is unsuccessful")
-	ErrNoIPv4                  = errors.New("ip address is not ipv4")
-	ErrInvalid                 = errors.New("ip address is invalid")
-	Timeout      time.Duration = 5
+	domain       = "api.my-ip.io"
+	ErrNoIP      = errors.New("ip address is empty")
+	ErrNoSuccess = errors.New("ip address is unsuccessful")
+	ErrNoIPv4    = errors.New("ip address is not ipv4")
+	ErrInvalid   = errors.New("ip address is invalid")
 )
+
+const timeout time.Duration = 5
 
 // IPv4 returns the Internet facing IP address of the free my-ip.io service.
 func IPv4() string {
@@ -61,7 +62,7 @@ func IPv4() string {
 
 func get() (string, error) {
 	c := &http.Client{
-		Timeout: Timeout * time.Second,
+		Timeout: timeout * time.Second,
 	}
 	ctx := context.Background()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+path.Join(domain, "ip.json"), nil)

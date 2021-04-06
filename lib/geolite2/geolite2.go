@@ -12,10 +12,10 @@ import (
 const lang = "en"
 
 //go:embed db/GeoLite2-Country/GeoLite2-Country.mmdb
-var country []byte
+var country []byte // nolint:gochecknoglobals
 
 //go:embed db/GeoLite2-City/GeoLite2-City.mmdb
-var city []byte
+var city []byte // nolint:gochecknoglobals
 
 func Country(ip string) (string, error) {
 	// use FromBytes() instead of Open("file.mmdb")
