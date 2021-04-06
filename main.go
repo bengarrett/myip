@@ -25,6 +25,15 @@ type modes struct {
 	simple bool
 }
 
+type jobs uint8
+
+const (
+	job1 jobs = iota
+	job2
+	job3
+	job4
+)
+
 func main() {
 	var p ping
 	flag.BoolVar(&p.mode.first, "first", false, "Returns the first reported IP address, its location and exits.")
@@ -72,10 +81,10 @@ func version() {
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	go p.worker(1, c)
-	go p.worker(2, c)
-	go p.worker(3, c)
-	go p.worker(4, c)
+	go p.worker(job1, c)
+	go p.worker(job2, c)
+	go p.worker(job3, c)
+	go p.worker(job4, c)
 	<-c
 	close(c)
 	fmt.Println()
@@ -85,10 +94,10 @@ func (p ping) first() {
 func (p ping) standard() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	go p.worker(1, c)
-	go p.worker(2, c)
-	go p.worker(3, c)
-	go p.worker(4, c)
+	go p.worker(job1, c)
+	go p.worker(job2, c)
+	go p.worker(job3, c)
+	go p.worker(job4, c)
 	_, _, _, _ = <-c, <-c, <-c, <-c
 	fmt.Println()
 }
@@ -114,16 +123,16 @@ func (p ping) count() string {
 	return fmt.Sprintf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
-func (p *ping) worker(i int, c chan string) {
+func (p *ping) worker(i jobs, c chan string) {
 	var s string
 	switch i {
-	case 1:
+	case job1:
 		s = ipify.IPv4()
-	case 2:
+	case job2:
 		s = myipcom.IPv4()
-	case 3:
+	case job3:
 		s = myipio.IPv4()
-	case 4:
+	case job4:
 		s = seeip.IPv4()
 	}
 	fmt.Print(p.parse(s))
