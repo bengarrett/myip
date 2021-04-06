@@ -36,6 +36,7 @@ var (
 	ErrNoSuccess = errors.New("ip address is unsuccessful")
 	ErrNoIPv4    = errors.New("ip address is not ipv4")
 	ErrInvalid   = errors.New("ip address is invalid")
+	ErrStatus    = errors.New("unusual my-ip.io server response")
 )
 
 const (
@@ -77,8 +78,7 @@ func get(d string) (string, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		StatusErr := errors.New("unusual my-ip.io server response")
-		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), StatusErr)
+		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), ErrStatus)
 	}
 	r, err := parse(resp.Body)
 	if err != nil {

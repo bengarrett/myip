@@ -13,7 +13,6 @@ const (
 	countries
 )
 
-// example.com
 const example = "93.184.216.34"
 
 func BenchmarkCountry(b *testing.B) {

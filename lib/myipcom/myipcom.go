@@ -29,6 +29,7 @@ type Result struct {
 var (
 	ErrNoIP    = errors.New("ip address is empty")
 	ErrInvalid = errors.New("ip address is invalid")
+	ErrStatus  = errors.New("unusual myip.com server response")
 )
 
 const (
@@ -69,8 +70,7 @@ func get(d string) (string, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		StatusErr := errors.New("unusual myip.com server response")
-		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), StatusErr)
+		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), ErrStatus)
 	}
 	r, err := parse(resp.Body)
 	if err != nil {

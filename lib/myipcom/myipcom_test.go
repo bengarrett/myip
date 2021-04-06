@@ -84,12 +84,12 @@ func TestResult_valid(t *testing.T) {
 				ISOCode: tt.fields.ISOCode,
 			}
 			got, err := r.valid()
-			if err != tt.wantErr {
-				t.Errorf("Result.valid() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if got != tt.want {
+				t.Errorf("Result.valid() = %v, want %v", got, tt.want)
 			}
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("Result.valid() = %v, want %v", got, tt.want)
+				t.Errorf("Result.valid() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 		})
 	}

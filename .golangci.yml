@@ -81,6 +81,8 @@ linters:
     - goconst
     - gocritic
     - gocyclo
+    - godot
+    - goerr113
     - gofmt
     - goimports
     - golint
@@ -109,11 +111,9 @@ linters:
   # don't enable:
   # - asciicheck
   # - scopelint
-  # - gochecknoglobals
   # - gocognit
   # - godot
   # - godox
-  # - goerr113
   # - interfacer
   # - maligned
   # - nestif

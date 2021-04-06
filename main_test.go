@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-// example.com
 const (
 	example = "93.184.216.34"
 	norwell = "93.184.216.34, Norwell, United States"
