@@ -11,7 +11,8 @@ import (
 )
 
 // https://api.myip.com
-
+//
+// Output:
 // {"ip":"118.209.50.85","country":"Australia","cc":"AU"}
 
 // Result of IPv4 query.
@@ -21,9 +22,12 @@ type Result struct {
 	ISOCode string `json:"cc"`
 }
 
-var result Result
-
-const domain = "api.myip.com"
+var (
+	result     Result
+	domain     = "api.myip.com"
+	ErrNoIP    = errors.New("ip address is empty")
+	ErrInvalid = errors.New("ip address is invalid")
+)
 
 // IPv4 returns the Internet facing IP address using the free myip.com service.
 func IPv4() (s string) {
@@ -69,10 +73,10 @@ func parse(r io.Reader) (Result, error) {
 
 func (r Result) valid() (bool, error) {
 	if r.IP == "" {
-		return false, errors.New("ip address is empty")
+		return false, ErrNoIP
 	}
 	if net.ParseIP(r.IP) == nil {
-		return false, errors.New("ip address is invalid")
+		return false, ErrInvalid
 	}
 
 	return true, nil
