@@ -19,7 +19,7 @@ type ping struct {
 }
 
 type modes struct {
-	fast   bool
+	first  bool
 	simple bool
 }
 
@@ -27,8 +27,8 @@ func main() {
 	var p ping
 	flag.BoolVar(&p.mode.simple, "simple", false, "simple mode only displays an IP address and exits")
 	flag.BoolVar(&p.mode.simple, "s", false, "")
-	flag.BoolVar(&p.mode.fast, "fast", false, "fast mode returns the first reported IP address and exits")
-	flag.BoolVar(&p.mode.fast, "f", false, "")
+	flag.BoolVar(&p.mode.first, "first", false, "returns the first reported IP address and exits")
+	flag.BoolVar(&p.mode.first, "f", false, "")
 	ver := flag.Bool("version", false, "version and information for this program")
 	v := flag.Bool("v", false, "")
 	flag.Parse()
@@ -37,9 +37,9 @@ func main() {
 		version()
 		return
 	}
-	// fast mode
-	if p.mode.fast {
-		p.fast()
+	// first mode
+	if p.mode.first {
+		p.first()
 		return
 	}
 	// standard mode
@@ -56,7 +56,7 @@ func version() {
 
 // Fast waits for the fastest concurrent request to complete
 // then aborts and closes the others.
-func (p ping) fast() {
+func (p ping) first() {
 	p.count()
 	c := make(chan string)
 	go p.request1(c)
@@ -91,7 +91,7 @@ func (p ping) count() {
 	}
 	// standard prints the ip addresses with request complete counts
 	total := 4
-	if p.mode.fast {
+	if p.mode.first {
 		total = 1
 	}
 	if p.complete == 0 {
