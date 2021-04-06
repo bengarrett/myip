@@ -45,15 +45,15 @@ func get() (string, error) {
 	c := &http.Client{
 		Timeout: Timeout * time.Second,
 	}
-	res, err := c.Get("https://" + domain)
+	resp, err := c.Get("https://" + domain)
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("%s, %w", strings.ToLower(res.Status), ErrStatus)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), ErrStatus)
 	}
-	b, err := ioutil.ReadAll(res.Body)
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
