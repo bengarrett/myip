@@ -34,6 +34,12 @@ const (
 	job4
 )
 
+var (
+	Version = "0.0.0" // nolint:gochecknoglobals
+	Commit  = "unset" // nolint:gochecknoglobals
+	Date    = "unset" // nolint:gochecknoglobals
+)
+
 func main() {
 	var p ping
 	flag.BoolVar(&p.mode.first, "first", false, "Returns the first reported IP address, its location and exits.")
@@ -65,15 +71,15 @@ func self() (string, error) {
 // Version prints out the program information and version.
 func version() {
 	const copyright = "\u00A9"
-	const app = "0.0"
-	fmt.Printf("MyIP v%s\n%s 2021 Ben Garrett\n\n", app, copyright)
-	fmt.Println("Web:  https://github.com/bengarrett/myip")
+	fmt.Printf("MyIP v%s\n%s 2021 Ben Garrett\n", Version, copyright)
+	fmt.Printf("github.com/bengarrett/myip\n\n")
+	fmt.Printf("build: %s (%s)\n", Commit, Date)
 	exe, err := self()
 	if err != nil {
-		fmt.Printf("Path: %s\n", err)
+		fmt.Printf("path: %s\n", err)
 		return
 	}
-	fmt.Printf("Path: %s\n", exe)
+	fmt.Printf("path:  %s\n", exe)
 }
 
 // Fast waits for the fastest concurrent request to complete
