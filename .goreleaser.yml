@@ -24,6 +24,7 @@ archives:
     format: tar.gz
     files:
     - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       amd64: Intel
       linux: Linux
@@ -32,6 +33,7 @@ archives:
     format: tar.gz
     files:
     - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       arm: arm32_
       arm64: arm64
@@ -41,6 +43,7 @@ archives:
     format: tar.gz
     files:
     - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       arm64: M-series
       amd64: Intel
@@ -50,6 +53,7 @@ archives:
     format: zip
     files:
     - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       amd64: Intel
       windows: Windows
@@ -57,6 +61,7 @@ archives:
 nfpms:
   - id: Linux
     builds: ['Linux Intel']
+    file_name_template: "{{ .ProjectName }}"
     replacements:
       amd64: Intel
       linux: Linux
