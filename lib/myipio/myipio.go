@@ -40,7 +40,7 @@ var (
 )
 
 const (
-	domain                = "api.my-ip.io"
+	domain                = "api4.my-ip.io"
 	timeout time.Duration = 5
 )
 
