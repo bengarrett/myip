@@ -49,7 +49,7 @@ func IPv4() string {
 			fmt.Printf("\n%s: %s\n", domain, err)
 			return ""
 		}
-		log.Fatalln(err)
+		log.Fatalf("\n%s error: %s\n", domain, err)
 	}
 
 	return s
