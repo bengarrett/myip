@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/bengarrett/myip/lib/geolite2"
 	"github.com/bengarrett/myip/lib/ipify"
@@ -65,7 +64,7 @@ func self() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("self error: %w", err)
 	}
-	return filepath.Dir(exe), nil
+	return exe, nil
 }
 
 // Info prints out the program information and version.
