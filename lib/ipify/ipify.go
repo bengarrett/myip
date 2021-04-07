@@ -25,7 +25,7 @@ var (
 )
 
 const (
-	domain                = "api.ipify.org"
+	domain                = "api4.ipify.org"
 	timeout time.Duration = 5
 )
 
