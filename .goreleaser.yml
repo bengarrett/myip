@@ -9,6 +9,37 @@ archives:
     files:
     - none*
 
+    # Custom environment variables to be set during the builds.
+    # Default is empty.
+    env:
+      - CGO_ENABLED=0
+
+    # GOOS list to build for.
+    # For more info refer to: https://golang.org/doc/install/source#environment
+    # Defaults are darwin and linux.
+    goos:
+      - darwin
+      - linux
+      - windows
+      # - freebsd
+      # - netbsd
+      # - openbsd
+
+    # GOARCH to build for.
+    # For more info refer to: https://golang.org/doc/install/source#environment
+    # Defaults are 386, amd64 and arm64.
+    goarch:
+      - amd64
+      - arm
+      - arm64
+
+    # List of combinations of GOOS + GOARCH + GOARM to ignore.
+    # Default is empty.
+    ignore:
+      - goos: linux
+        goarch: arm
+        goarm: 7
+
     # Archive name template.
     # Defaults:
     # - if format is `tar.gz`, `tar.xz`, `gz` or `zip`:
