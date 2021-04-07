@@ -1,70 +1,71 @@
 # .goreleaser.yml
+#
+# test the config:
+# goreleaser check
+# goreleaser release --skip-publish --skip-validate --rm-dist
+
 builds:
-  -
-
-    # Custom environment variables to be set during the builds.
-    # Default is empty.
-    env:
-      - CGO_ENABLED=0
-
-    # GOOS list to build for.
-    # For more info refer to: https://golang.org/doc/install/source#environment
-    # Defaults are darwin and linux.
-    goos:
-      - darwin
-      - linux
-      - windows
-      # - freebsd
-      # - netbsd
-      # - openbsd
-
-    # GOARCH to build for.
-    # For more info refer to: https://golang.org/doc/install/source#environment
-    # Defaults are 386, amd64 and arm64.
-    goarch:
-      - amd64
-      - arm
-      - arm64
-
-    # List of combinations of GOOS + GOARCH + GOARM to ignore.
-    # Default is empty.
-    ignore:
-      - goos: linux
-        goarch: arm
-        goarm: 7
+  - id: Linux Intel
+    goos: ['linux']
+    goarch: ['amd64']
+  - id: Linux arm
+    goos: ['linux']
+    goarch: ['arm', 'arm64']
+  - id: macOS
+    goos: ['darwin']
+    goarch: ['amd64', 'arm64']
+  - id: Windows
+    goos: ['windows']
+    goarch: ['amd64']
 
 archives:
-  -
-    # Archive format. Valid options are `tar.gz`, `tar.xz`, `gz`, `zip` and `binary`.
-    # If format is `binary`, no archives are created and the binaries are instead
-    # uploaded directly.
-    # Default is `tar.gz`.
+  - id: Linux Intel
+    builds: ['Linux Intel']
     format: tar.gz
     files:
     - none*
-
-    # Archive name template.
-    # Defaults:
-    # - if format is `tar.gz`, `tar.xz`, `gz` or `zip`:
-    #   - `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}`
-    # - if format is `binary`:
-    #   - `{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}`
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-
-    # Replacements for GOOS and GOARCH in the archive name.
-    # Keys should be valid GOOSs or GOARCHs.
-    # Values are the respective replacements.
-    # Default is empty.
     replacements:
-      amd64: 64-bit
-      386: 32-bit
-      darwin: macOS
+      amd64: Intel
       linux: Linux
+  - id: Linux arm
+    builds: ['Linux arm']
+    format: tar.gz
+    files:
+    - none*
+    replacements:
+      arm: arm32_
+      arm64: arm64
+      linux: Linux
+  - id: macOS
+    builds: ['macOS']
+    format: tar.gz
+    files:
+    - none*
+    replacements:
+      arm64: M-series
+      amd64: Intel
+      darwin: macOS
+  - id: Windows
+    builds: ['Windows']
+    format: zip
+    files:
+    - none*
+    replacements:
+      amd64: Intel
       windows: Windows
 
-    # Can be used to change the archive formats for specific GOOSs.
-    # Most common use case is to archive as zip on Windows.
-    # Default is empty.
-    format_overrides:
-      - goos: windows
-        format: zip
+nfpms:
+  - id: Linux
+    builds: ['Linux Intel']
+    replacements:
+      amd64: Intel
+      linux: Linux
+    vendor: Drum Roll Inc.
+    homepage: https://example.com/
+    maintainer: Drummer <drum-roll@example.com>
+    description: Software to create fast and easy drum rolls.
+    license: Apache 2.0
+    formats:
+      - apk
+      - deb
+      - rpm
