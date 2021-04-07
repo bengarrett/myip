@@ -1,13 +1,6 @@
 # .goreleaser.yml
-archives:
+builds:
   -
-    # Archive format. Valid options are `tar.gz`, `tar.xz`, `gz`, `zip` and `binary`.
-    # If format is `binary`, no archives are created and the binaries are instead
-    # uploaded directly.
-    # Default is `tar.gz`.
-    format: tar.gz
-    files:
-    - none*
 
     # Custom environment variables to be set during the builds.
     # Default is empty.
@@ -39,6 +32,16 @@ archives:
       - goos: linux
         goarch: arm
         goarm: 7
+
+archives:
+  -
+    # Archive format. Valid options are `tar.gz`, `tar.xz`, `gz`, `zip` and `binary`.
+    # If format is `binary`, no archives are created and the binaries are instead
+    # uploaded directly.
+    # Default is `tar.gz`.
+    format: tar.gz
+    files:
+    - none*
 
     # Archive name template.
     # Defaults:
