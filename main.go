@@ -68,10 +68,10 @@ func self() (string, error) {
 	return filepath.Dir(exe), nil
 }
 
-// Version prints out the program information and version.
+// Info prints out the program information and version.
 func info() {
 	const copyright = "\u00A9"
-	fmt.Printf("MyIP v%s\n%s 2021 Ben Garrett\n", version, copyright)
+	fmt.Printf("MyIP Tetrad v%s\n%s 2021 Ben Garrett\n", version, copyright)
 	fmt.Printf("github.com/bengarrett/myip\n\n")
 	fmt.Printf("build: %s (%s)\n", commit, date)
 	exe, err := self()
