@@ -5,7 +5,7 @@ archives:
     # If format is `binary`, no archives are created and the binaries are instead
     # uploaded directly.
     # Default is `tar.gz`.
-    format: gz
+    format: tar.gz
     files:
     - none*
 
@@ -25,7 +25,8 @@ archives:
       amd64: 64-bit
       386: 32-bit
       darwin: macOS
-      linux: Tux
+      linux: Linux
+      windows: Windows
 
     # Can be used to change the archive formats for specific GOOSs.
     # Most common use case is to archive as zip on Windows.

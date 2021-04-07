@@ -35,9 +35,9 @@ const (
 )
 
 var (
-	Version = "0.0.0" // nolint:gochecknoglobals
-	Commit  = "unset" // nolint:gochecknoglobals
-	Date    = "unset" // nolint:gochecknoglobals
+	version = "0.0.0" // nolint:gochecknoglobals
+	commit  = "unset" // nolint:gochecknoglobals
+	date    = "unset" // nolint:gochecknoglobals
 )
 
 func main() {
@@ -48,7 +48,7 @@ func main() {
 	flag.Parse()
 	// version information
 	if *ver {
-		version()
+		info()
 		return
 	}
 	// first mode
@@ -69,11 +69,11 @@ func self() (string, error) {
 }
 
 // Version prints out the program information and version.
-func version() {
+func info() {
 	const copyright = "\u00A9"
-	fmt.Printf("MyIP v%s\n%s 2021 Ben Garrett\n", Version, copyright)
+	fmt.Printf("MyIP v%s\n%s 2021 Ben Garrett\n", version, copyright)
 	fmt.Printf("github.com/bengarrett/myip\n\n")
-	fmt.Printf("build: %s (%s)\n", Commit, Date)
+	fmt.Printf("build: %s (%s)\n", commit, date)
 	exe, err := self()
 	if err != nil {
 		fmt.Printf("path: %s\n", err)
