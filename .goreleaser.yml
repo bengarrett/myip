@@ -65,11 +65,11 @@ nfpms:
     replacements:
       amd64: Intel
       linux: Linux
-    vendor: Drum Roll Inc.
-    homepage: https://example.com/
-    maintainer: Drummer <drum-roll@example.com>
-    description: Software to create fast and easy drum rolls.
-    license: Apache 2.0
+    vendor: Ben Garrett.
+    homepage: https://github.com/bengarrett/myip
+    maintainer: Ben Garrett <code.by.ben@gmail.com>
+    description: Determine your Internet-facing IP address and location from multiple sources.
+    license: MIT License
     formats:
       - apk
       - deb
