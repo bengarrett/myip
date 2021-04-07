@@ -5,6 +5,9 @@
 # goreleaser release --skip-publish --skip-validate --rm-dist
 
 builds:
+  - id: FreeBSD
+    goos: ['freebsd']
+    goarch: ['amd64']
   - id: Linux Intel
     goos: ['linux']
     goarch: ['amd64']
@@ -19,6 +22,15 @@ builds:
     goarch: ['amd64']
 
 archives:
+  - id: FreeBSD
+    builds: ['FreeBSD']
+    format: tar.gz
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    replacements:
+      amd64: Intel
+      freebsd: FreeBSD
   - id: Linux Intel
     builds: ['Linux Intel']
     format: tar.gz

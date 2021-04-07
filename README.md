@@ -10,15 +10,17 @@ MyIP Tetrad is a simple to use terminal tool to determine your Internet-facing I
 - [Windows](https://github.com/bengarrett/myip/releases/latest/download/myip_Windows_Intel.zip)
 - [macOS](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_Intel.tar.gz
 )
+- [FreeBSD](https://github.com/bengarrett/myip/releases/latest/download/myip_FreeBSD_Intel.tar.gz
+)
 - [Linux](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_Intel.tar.gz
 )
 - - [APK](https://github.com/bengarrett/myip/releases/latest/download/myip.apk
-) (Alpine package)
-- - [DEB](https://github.com/bengarrett/myip/releases/latest/download/myip.deb) (Debian package)
-- - [RPM](https://github.com/bengarrett/myip/releases/latest/download/myip.rpm) (Redhat package)
+) (Alpine package)<br>`apk add myip.apk`
+- - [DEB](https://github.com/bengarrett/myip/releases/latest/download/myip.deb) (Debian package)<br>`dpkg -i myip.deb`
+- - [RPM](https://github.com/bengarrett/myip/releases/latest/download/myip.rpm) (Redhat package)<br>`rpm -i myip.rpm`
 
 ### arm
-- [macOS, Apple Mx cpu](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_M-series.tar.gz
+- [macOS on Apple M chips](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_M-series.tar.gz
 )
 - [Linux arm32](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_arm32_.tar.gz
 ) (Raspberry Pi and other single-board computers)
@@ -91,8 +93,8 @@ go build
 # target windows 32-bit
 env GOOS=windows GOARCH=386 go build
 
-# target freebsd
-env GOOS=freebsd GOARCH=amd64 go build
+# target openbsd
+env GOOS=openbsd GOARCH=amd64 go build
 
 # target linux on mips
 env GOOS=linux GOARCH=mips64 go build
