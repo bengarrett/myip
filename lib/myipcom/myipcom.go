@@ -18,6 +18,7 @@ import (
 //
 // Output:
 // {"ip":"118.209.50.85","country":"Australia","cc":"AU"}
+// Note: The returned IP address can be either v4 or v6.
 
 // Result of IPv4 query.
 type Result struct {
@@ -28,6 +29,7 @@ type Result struct {
 
 var (
 	ErrNoIP    = errors.New("ip address is empty")
+	ErrNoIPv4  = errors.New("ip address is not v4")
 	ErrInvalid = errors.New("ip address is invalid")
 	ErrStatus  = errors.New("unusual myip.com server response")
 )
@@ -40,6 +42,9 @@ const (
 // IPv4 returns the Internet facing IP address using the free myip.com service.
 func IPv4() string {
 	s, err := get(domain)
+	if errors.Is(err, ErrNoIPv4) {
+		return ""
+	}
 	if err != nil {
 		if _, ok := err.(*url.Error); ok {
 			if strings.Contains(err.Error(), "context deadline exceeded") {
@@ -79,7 +84,6 @@ func get(d string) (string, error) {
 	if ok, err := r.valid(); !ok {
 		return r.IP, err
 	}
-
 	return r.IP, nil
 }
 
@@ -96,9 +100,12 @@ func (r Result) valid() (bool, error) {
 	if r.IP == "" {
 		return false, ErrNoIP
 	}
-	if net.ParseIP(r.IP) == nil {
+	ip := net.ParseIP(r.IP)
+	if ip == nil {
 		return false, ErrInvalid
 	}
-
+	if ip.To4() == nil {
+		return false, ErrNoIPv4
+	}
 	return true, nil
 }
