@@ -86,10 +86,10 @@ myip
 # clone this repo
 git clone git@github.com:bengarrett/myip.git
 
-# build the app
+# access the repo
 cd myip
 
-# target host system
+# target and build the app for the host system
 go build
 
 # target windows 32-bit
