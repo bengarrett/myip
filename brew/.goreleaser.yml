@@ -1,0 +1,72 @@
+# .goreleaser.yml
+#
+# A specific config for homebrew releases
+# that cannot be run using Github Actions.
+#
+# test the config:
+# goreleaser check
+# goreleaser release --skip-publish --skip-validate --rm-dist
+
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: Linux Intel
+    goos: ['linux']
+    goarch: ['amd64']
+    dir: ./../
+  - id: macOS
+    goos: ['darwin']
+    goarch: ['amd64', 'arm64']
+    dir: ./../
+
+archives:
+  - id: Linux Intel
+    builds: ['Linux Intel']
+    format: tar.gz
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    replacements:
+      amd64: Intel
+      linux: Linux
+  - id: macOS
+    builds: ['macOS']
+    format: tar.gz
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    replacements:
+      arm64: M-series
+      amd64: Intel
+      darwin: macOS
+
+release:
+  disable: true
+
+brews:
+  -
+    name: myip
+    ids: ['macOS', 'Linux']
+
+    # GOARM to specify which 32-bit arm version to use if there are multiple versions
+    # from the build section. Brew formulas support atm only one 32-bit version.
+    # Default is 6 for all artifacts or each id if there a multiple versions.
+    goarm: 6
+
+    tap:
+      owner: bengarrett
+      name: homebrew-tap
+
+    # Folder inside the repository to put the formula.
+    # Default is the root folder.
+    folder: Formula
+
+    # Your app's homepage.
+    homepage: "https://github.com/bengarrett/myip/"
+
+    # Your app's description.
+    description: "Determine your Internet-facing IP address and location from multiple sources."
+
+    # SPDX identifier of your app's license.
+    license: "MIT"
