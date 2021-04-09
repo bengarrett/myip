@@ -12,10 +12,12 @@ before:
     - go mod tidy
 builds:
   - id: Linux Intel
+    binary: myip
     goos: ['linux']
     goarch: ['amd64']
     dir: ./../
   - id: macOS
+    binary: myip
     goos: ['darwin']
     goarch: ['amd64', 'arm64']
     dir: ./../
