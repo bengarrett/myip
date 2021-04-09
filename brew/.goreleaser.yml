@@ -41,8 +41,10 @@ archives:
       amd64: Intel
       darwin: macOS
 
-release:
-  disable: true
+release
+  github:
+    owner: bengarrett
+    name: homebrew-tap
 
 brews:
   -
