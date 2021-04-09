@@ -41,7 +41,7 @@ archives:
       amd64: Intel
       darwin: macOS
 
-release
+release:
   github:
     owner: bengarrett
     name: homebrew-tap
