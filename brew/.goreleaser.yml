@@ -64,3 +64,6 @@ brews:
 
     # SPDX identifier of your app's license.
     license: "MIT"
+
+    install: |
+      bin.install "myip"
