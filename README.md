@@ -8,6 +8,13 @@ It is an excellent tool for quickly determining if your machine or network is co
 
 ## Downloads
 
+### Packages
+
+##### macOS Homebrew
+```sh
+brew install bengarrett/homebrew-myip/myip
+```
+
 ### Intel
 - [Windows](https://github.com/bengarrett/myip/releases/latest/download/myip_Windows_Intel.zip)
 - [macOS](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_Intel.tar.gz
