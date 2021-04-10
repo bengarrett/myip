@@ -10,28 +10,8 @@
 before:
   hooks:
     - go mod tidy
-builds:
-  - id: Linux Intel
-    binary: myip
-    goos: ['linux']
-    goarch: ['amd64']
-    dir: ./../
-  - id: macOS
-    binary: myip
-    goos: ['darwin']
-    goarch: ['amd64', 'arm64']
-    dir: ./../
 
 archives:
-  - id: Linux Intel
-    builds: ['Linux Intel']
-    format: tar.gz
-    files:
-    - none*
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      amd64: Intel
-      linux: Linux
   - id: macOS
     builds: ['macOS']
     format: tar.gz
@@ -50,11 +30,11 @@ release:
 
 brews:
   -
-    ids: ['macOS', 'Linux']
+    ids: ['macOS']
 
     tap:
       owner: bengarrett
-      name: homebrew-myip
+      name: myip
 
     # Your app's homepage.
     homepage: "https://github.com/bengarrett/myip/"
