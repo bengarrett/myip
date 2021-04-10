@@ -50,21 +50,11 @@ release:
 
 brews:
   -
-    name: myip
     ids: ['macOS', 'Linux']
-
-    # GOARM to specify which 32-bit arm version to use if there are multiple versions
-    # from the build section. Brew formulas support atm only one 32-bit version.
-    # Default is 6 for all artifacts or each id if there a multiple versions.
-    goarm: 6
 
     tap:
       owner: bengarrett
       name: homebrew-myip
-
-    # Folder inside the repository to put the formula.
-    # Default is the root folder.
-    folder: Formula
 
     # Your app's homepage.
     homepage: "https://github.com/bengarrett/myip/"
