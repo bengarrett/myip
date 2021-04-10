@@ -105,12 +105,12 @@ cd myip
 # target and build the app for the host system
 go build
 
-# target windows 32-bit
+# target and build for Windows 7+ 32-bit
 env GOOS=windows GOARCH=386 go build
 
-# target openbsd
+# target and build for OpenBSD
 env GOOS=openbsd GOARCH=amd64 go build
 
-# target linux on mips
+# target and build for Linux on MIPS CPUs
 env GOOS=linux GOARCH=mips64 go build
 ```
