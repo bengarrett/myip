@@ -46,7 +46,7 @@ archives:
 release:
   github:
     owner: bengarrett
-    name: homebrew-tap
+    name: homebrew-myip
 
 brews:
   -
@@ -60,7 +60,7 @@ brews:
 
     tap:
       owner: bengarrett
-      name: homebrew-tap
+      name: homebrew-myip
 
     # Folder inside the repository to put the formula.
     # Default is the root folder.
