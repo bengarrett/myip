@@ -89,3 +89,27 @@ nfpms:
       - apk
       - deb
       - rpm
+
+scoop:
+  bucket:
+    owner: bengarrett
+    name: myip
+
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+
+  commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
+
+  homepage: "https://github.com/bengarrett/myip/"
+
+  description: "Determine your Internet-facing IP address and location from multiple sources."
+
+  license: MIT
+
+  # Setting this will prevent goreleaser to actually try to commit the updated
+  # manifest leaving the responsibility of publishing it to the user.
+  # If set to auto, the release will not be uploaded to the scoop bucket
+  # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+  # Default is false.
+  skip_upload: auto
