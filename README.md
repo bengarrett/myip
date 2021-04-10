@@ -15,6 +15,12 @@ It is an excellent tool for quickly determining if your machine or network is co
 brew install bengarrett/homebrew-myip/myip
 ```
 
+##### Windows [Scoop](https://scoop.sh/)
+```sh
+scoop bucket add bengarrett https://github.com/bengarrett/myip.git
+scoop install bengarrett/myip
+```
+
 ### Intel
 - [Windows](https://github.com/bengarrett/myip/releases/latest/download/myip_Windows_Intel.zip)
 - [macOS](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_Intel.tar.gz
