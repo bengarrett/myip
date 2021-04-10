@@ -1,0 +1,15 @@
+{
+    "version": "0.9.3",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/bengarrett/myip/releases/download/v0.9.3/myip_Windows_Intel.zip",
+            "bin": [
+                "myip.exe"
+            ],
+            "hash": "b8e5e76886c5d9e62466561ee94f41c4673e57a49291db607fbc5e9f98ea0809"
+        }
+    },
+    "homepage": "https://github.com/bengarrett/myip/",
+    "license": "MIT",
+    "description": "Determine your Internet-facing IP address and location from multiple sources."
+}
