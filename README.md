@@ -10,7 +10,7 @@ It is an excellent tool for quickly determining if your machine or network is co
 
 ### Packages
 
-##### macOS Homebrew
+##### macOS [Homebrew](https://brew.sh/)
 ```sh
 brew install bengarrett/homebrew-myip/myip
 ```
