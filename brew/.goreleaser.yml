@@ -36,11 +36,12 @@ release:
 
 brews:
   -
+    name: myip
     ids: ['macOS']
 
     tap:
       owner: bengarrett
-      name: myip
+      name: homebrew-myip
 
     # Your app's homepage.
     homepage: "https://github.com/bengarrett/myip/"
@@ -50,6 +51,9 @@ brews:
 
     # SPDX identifier of your app's license.
     license: "MIT"
+
+    test: |
+      system "#{bin}/myip --version"
 
     install: |
       bin.install "myip"
