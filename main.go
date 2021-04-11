@@ -111,7 +111,7 @@ func info() {
 }
 
 // Fast waits for the fastest concurrent request to complete
-// before aborting and closing the others.
+// before aborting and cancelling the others.
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)
@@ -173,7 +173,7 @@ func (p *ping) worker(ctx context.Context, cancel context.CancelFunc, job jobs, 
 	case job1:
 		s = ipify.IPv4()
 	case job2:
-		s = myipcom.IPv4()
+		s, err = myipcom.IPv4(ctx, cancel)
 	case job3:
 		s, err = myipio.IPv4(ctx, cancel)
 	case job4:
