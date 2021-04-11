@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"text/tabwriter"
 
 	"github.com/bengarrett/myip/lib/geolite2"
 	"github.com/bengarrett/myip/lib/ipify"
@@ -41,17 +42,42 @@ var (
 
 func main() {
 	var p ping
-	flag.BoolVar(&p.mode.first, "first", false, "Returns the first reported IP address, its location and exits.")
-	flag.BoolVar(&p.mode.simple, "simple", false, "Simple mode only displays an IP address and exits.")
-	ver := flag.Bool("version", false, "Version and information for this program.")
+	flag.BoolVar(&p.mode.first, "first", false, "returns the first reported IP address and its location")
+	flag.BoolVar(&p.mode.simple, "simple", false, "simple mode only displays the IP address")
+	ver := flag.Bool("version", false, "version and information for this program")
+	f := flag.Bool("f", false, "alias for first")
+	s := flag.Bool("s", false, "alias for simple")
+	v := flag.Bool("v", false, "alias for version")
+
+	flag.Usage = func() {
+		const alias = 1
+		fmt.Fprintln(os.Stderr, "MyIP Usage:")
+		fmt.Fprintln(os.Stderr, "    myip [options]:")
+		fmt.Fprintln(os.Stderr, "")
+		w := tabwriter.NewWriter(os.Stderr, 0, 0, 4, ' ', 0)
+		fmt.Fprintln(w, "    -h, --help\tshow this list of options")
+		flag.VisitAll(func(f *flag.Flag) {
+			if len(f.Name) == alias {
+				return
+			}
+			fmt.Fprintf(w, "    -%v, --%v\t%v\n", f.Name[:1], f.Name, f.Usage) // f.Name, f.Value
+		})
+		w.Flush()
+	}
 	flag.Parse()
+
 	// version information
-	if *ver {
+	if *ver || *v {
 		info()
 		return
 	}
+	// simple alias
+	if *s {
+		p.mode.simple = true
+	}
 	// first mode
-	if p.mode.first {
+	if p.mode.first || *f {
+		p.mode.first = true
 		p.first()
 		return
 	}
