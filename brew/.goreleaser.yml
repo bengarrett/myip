@@ -3,6 +3,15 @@
 # A specific config for homebrew releases
 # that cannot be run using Github Actions.
 #
+# instructions:
+# push all changes to the github repo
+# on github publish a new release tag
+# in a terminal do the following:
+# cd myip
+# git pull
+# cd brew
+# goreleaser
+#
 # test the config:
 # goreleaser check
 # goreleaser release --skip-publish --skip-validate --rm-dist
