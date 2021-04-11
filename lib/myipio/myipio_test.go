@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
-	"path"
 	"strings"
 	"testing"
 	"time"
@@ -32,10 +30,6 @@ func TestIPv4(t *testing.T) {
 }
 
 func Test_request(t *testing.T) {
-	u, err := url.Parse(link)
-	if err != nil {
-		t.Errorf("failed to parse domain %q, %s", link, err)
-	}
 	tests := []struct {
 		name    string
 		domain  string
@@ -44,7 +38,7 @@ func Test_request(t *testing.T) {
 	}{
 		{"empty", "", false, "unsupported protocol scheme"},
 		{"html", "https://example.com", false, "invalid character"},
-		{"404", u.String() + path.Join(u.Path, "abcdef"), false, "404 not found"},
+		{"404", link + "/abcdef", false, "404 not found"},
 		{"okay", link, true, ""},
 	}
 	for _, tt := range tests {

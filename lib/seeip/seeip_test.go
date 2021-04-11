@@ -26,8 +26,8 @@ func TestIPv4(t *testing.T) {
 	}{
 		{"empty", "", false, true},
 		{"html", "https://example.com", false, true},
-		{"404", "https://ip4.seeip.org/abcdef", false, true},
-		{"okay", "https://ip4.seeip.org", true, false},
+		{"404", link + "/abcdef", false, true},
+		{"okay", link, true, false},
 	}
 	for _, tt := range tests {
 		d := tt.domain
