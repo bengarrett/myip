@@ -1,12 +1,15 @@
 package seeip
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 )
 
-func BenchmarkGet(b *testing.B) {
-	s, err := get(domain)
+func BenchmarkRequest(b *testing.B) {
+	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
+	s, err := request(ctx, timeout, link)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -22,14 +25,15 @@ func TestIPv4(t *testing.T) {
 		wantErr bool
 	}{
 		{"empty", "", false, true},
-		{"html", "example.com", false, true},
-		{"404", "ip4.seeip.org/abcdef", false, true},
-		{"okay", "ip4.seeip.org", true, false},
+		{"html", "https://example.com", false, true},
+		{"404", "https://ip4.seeip.org/abcdef", false, true},
+		{"okay", "https://ip4.seeip.org", true, false},
 	}
 	for _, tt := range tests {
 		d := tt.domain
 		t.Run(tt.name, func(t *testing.T) {
-			gotS, err := get(d)
+			ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
+			gotS, err := request(ctx, timeout, d)
 			if bool(err != nil) != tt.wantErr {
 				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
 			}

@@ -17,13 +17,10 @@ import (
 )
 
 type ping struct {
-	url      string
 	results  []string
 	complete int
 	Print    string
 	mode     modes
-	ctx      context.Context
-	cancel   context.CancelFunc
 }
 
 type modes struct {
@@ -133,11 +130,14 @@ func (p ping) first() {
 func (p ping) standard() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	ctx, to := context.WithTimeout(context.Background(), 5*time.Second)
-	go p.worker(ctx, to, job1, c)
-	go p.worker(ctx, to, job2, c)
-	go p.worker(ctx, to, job3, c)
-	go p.worker(ctx, to, job4, c)
+	ctx1, to1 := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx2, to2 := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx3, to3 := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx4, to4 := context.WithTimeout(context.Background(), 5*time.Second)
+	go p.worker(ctx1, to1, job1, c)
+	go p.worker(ctx2, to2, job2, c)
+	go p.worker(ctx3, to3, job3, c)
+	go p.worker(ctx4, to4, job4, c)
 	<-c
 	<-c
 	<-c
@@ -177,7 +177,7 @@ func (p *ping) worker(ctx context.Context, cancel context.CancelFunc, job jobs, 
 	case job3:
 		s, err = myipio.IPv4(ctx, cancel)
 	case job4:
-		s = seeip.IPv4()
+		s, err = seeip.IPv4(ctx, cancel)
 	}
 	if err != nil {
 		log.Fatalf("\n%s\n", err)
