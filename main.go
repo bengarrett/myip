@@ -63,7 +63,7 @@ func main() {
 			if len(f.Name) == alias {
 				return
 			}
-			fmt.Fprintf(w, "    -%v, --%v\t%v\n", f.Name[:1], f.Name, f.Usage) // f.Name, f.Value
+			fmt.Fprintf(w, "    -%v, --%v\t%v\n", f.Name[:1], f.Name, f.Usage)
 		})
 		w.Flush()
 	}
@@ -100,7 +100,7 @@ func self() (string, error) {
 func info() {
 	const copyright = "\u00A9"
 	fmt.Printf("MyIP Tetrad v%s\n%s 2021 Ben Garrett\n", version, copyright)
-	fmt.Printf("github.com/bengarrett/myip\n\n")
+	fmt.Printf("https://github.com/bengarrett/myip\n\n")
 	fmt.Printf("build: %s (%s)\n", commit, date)
 	exe, err := self()
 	if err != nil {
@@ -122,7 +122,9 @@ func (p ping) first() {
 	go p.worker(ctx, cancel, job4, c)
 	<-c
 	cancel()
-	close(c)
+	<-c
+	<-c
+	<-c
 	fmt.Println()
 }
 
@@ -220,7 +222,7 @@ func (p ping) city(ip string) (string, error) {
 	return fmt.Sprintf("%s, %s", ip, c), nil
 }
 
-// PrintSimple prints the IP address.
+// Simple prints the IP address.
 func (p ping) simple(ip string) string {
 	if len(p.results) > 1 {
 		return fmt.Sprintf("%s. %s", p.Print, ip)
