@@ -171,7 +171,7 @@ func (p *ping) worker(ctx context.Context, cancel context.CancelFunc, job jobs, 
 	var err error
 	switch job {
 	case job1:
-		s = ipify.IPv4()
+		s, err = ipify.IPv4(ctx, cancel)
 	case job2:
 		s, err = myipcom.IPv4(ctx, cancel)
 	case job3:

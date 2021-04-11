@@ -5,12 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 // https://api.ipify.org
@@ -25,49 +23,53 @@ var (
 )
 
 const (
-	domain                = "api.ipify.org"
-	timeout time.Duration = 5
+	domain = "api.ipify.org"
+	link   = "https://api.ipify.org"
 )
 
 // IPv4 returns the Internet facing IP address using the free ipify.org service.
-func IPv4() string {
-	s, err := get(domain)
+func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
+	s, err := request(ctx, cancel, link)
 	if err != nil {
 		if _, ok := err.(*url.Error); ok {
 			if strings.Contains(err.Error(), "context deadline exceeded") {
 				fmt.Printf("\n%s: timeout\n", domain)
-				return ""
+				return "", nil
 			}
 			fmt.Printf("\n%s: %s\n", domain, err)
-			return ""
+			return "", nil
 		}
-		log.Fatalf("\n%s error: %s\n", domain, err)
+		return "", fmt.Errorf("%s error: %s", domain, err)
 	}
 
-	return s
+	return s, nil
 }
 
-func get(d string) (string, error) {
-	c := &http.Client{
-		Timeout: timeout * time.Second,
-	}
-	ctx := context.Background()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+d, nil)
+func request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return "", err
 	}
-	resp, err := c.Do(req)
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
+
+	//log.Printf("\nReceived %d from %s\n", resp.StatusCode, url)
+
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), ErrStatus)
 	}
+
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
+
 	ip := string(b)
 	if ok, err := valid(ip); !ok {
 		return ip, err
