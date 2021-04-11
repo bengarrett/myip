@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -40,7 +39,7 @@ func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 			fmt.Printf("\n%s: %s\n", domain, err)
 			return "", nil
 		}
-		log.Fatalf("\n%s error: %s\n", domain, err)
+		return "", fmt.Errorf("%s error: %s", domain, err)
 	}
 
 	return s, nil
