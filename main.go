@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"text/tabwriter"
+	"time"
 
 	"github.com/bengarrett/myip/lib/geolite2"
 	"github.com/bengarrett/myip/lib/ipify"
@@ -14,10 +17,13 @@ import (
 )
 
 type ping struct {
+	url      string
 	results  []string
 	complete int
 	Print    string
 	mode     modes
+	ctx      context.Context
+	cancel   context.CancelFunc
 }
 
 type modes struct {
@@ -112,11 +118,13 @@ func info() {
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	go p.worker(job1, c)
-	go p.worker(job2, c)
-	go p.worker(job3, c)
-	go p.worker(job4, c)
+	ctx, cancel := context.WithCancel(context.Background())
+	go p.worker(ctx, cancel, job1, c)
+	go p.worker(ctx, cancel, job2, c)
+	go p.worker(ctx, cancel, job3, c)
+	go p.worker(ctx, cancel, job4, c)
 	<-c
+	cancel()
 	close(c)
 	fmt.Println()
 }
@@ -125,10 +133,11 @@ func (p ping) first() {
 func (p ping) standard() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	go p.worker(job1, c)
-	go p.worker(job2, c)
-	go p.worker(job3, c)
-	go p.worker(job4, c)
+	ctx, to := context.WithTimeout(context.Background(), 5*time.Second)
+	go p.worker(ctx, to, job1, c)
+	go p.worker(ctx, to, job2, c)
+	go p.worker(ctx, to, job3, c)
+	go p.worker(ctx, to, job4, c)
 	<-c
 	<-c
 	<-c
@@ -157,17 +166,21 @@ func (p ping) count() string {
 	return fmt.Sprintf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
-func (p *ping) worker(i jobs, c chan string) {
+func (p *ping) worker(ctx context.Context, cancel context.CancelFunc, job jobs, c chan string) {
 	var s string
-	switch i {
+	var err error
+	switch job {
 	case job1:
 		s = ipify.IPv4()
 	case job2:
 		s = myipcom.IPv4()
 	case job3:
-		s = myipio.IPv4()
+		s, err = myipio.IPv4(ctx, cancel)
 	case job4:
 		s = seeip.IPv4()
+	}
+	if err != nil {
+		log.Fatalf("\n%s\n", err)
 	}
 	fmt.Print(p.parse(s))
 	c <- s

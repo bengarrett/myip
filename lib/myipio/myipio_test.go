@@ -1,16 +1,19 @@
 package myipio
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
 	"path"
 	"strings"
 	"testing"
+	"time"
 )
 
-func BenchmarkGet(b *testing.B) {
-	s, err := get(domain)
+func BenchmarkRequest(b *testing.B) {
+	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
+	s, err := request(ctx, timeout, link)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -19,16 +22,19 @@ func BenchmarkGet(b *testing.B) {
 }
 
 func TestIPv4(t *testing.T) {
-	wantS, _ := get(domain)
-	if gotS := IPv4(); gotS != wantS {
+	rc, rto := context.WithTimeout(context.Background(), 5*time.Second)
+	wantS, _ := request(rc, rto, link)
+
+	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
+	if gotS, _ := IPv4(ctx, timeout); gotS != wantS {
 		t.Errorf("IPv4() = %v, want %v", gotS, wantS)
 	}
 }
 
-func Test_get(t *testing.T) {
-	u, err := url.Parse(domain)
+func Test_request(t *testing.T) {
+	u, err := url.Parse(link)
 	if err != nil {
-		t.Errorf("failed to parse domain %q, %s", domain, err)
+		t.Errorf("failed to parse domain %q, %s", link, err)
 	}
 	tests := []struct {
 		name    string
@@ -36,15 +42,15 @@ func Test_get(t *testing.T) {
 		isValid bool
 		wantErr string
 	}{
-		{"empty", "", false, "no such host"},
-		{"html", "example.com", false, "404 not found"},
-		{"404", path.Join(u.Path, "abcdef"), false, "404 not found"},
-		{"okay", domain, true, ""},
+		{"empty", "", false, "unsupported protocol scheme"},
+		{"html", "https://example.com", false, "invalid character"},
+		{"404", u.String() + path.Join(u.Path, "abcdef"), false, "404 not found"},
+		{"okay", link, true, ""},
 	}
 	for _, tt := range tests {
-		d := tt.domain
 		t.Run(tt.name, func(t *testing.T) {
-			gotS, err := get(d)
+			ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
+			gotS, err := request(ctx, timeout, tt.domain)
 			if err != nil && tt.wantErr != "" && !strings.Contains(fmt.Sprint(err), tt.wantErr) {
 				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
 			}

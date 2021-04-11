@@ -6,13 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
-	"time"
 )
 
 // https://api.my-ip.io/ip.json
@@ -40,50 +37,53 @@ var (
 )
 
 const (
-	domain                = "api4.my-ip.io"
-	timeout time.Duration = 5
+	domain = "api4.my-ip.io"
+	link   = "https://api4.my-ip.io/ip.json"
 )
 
 // IPv4 returns the Internet facing IP address of the free my-ip.io service.
-func IPv4() string {
-	d := domain
-	s, err := get(d)
+func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
+	s, err := request(ctx, cancel, link)
 	if err != nil {
 		if _, ok := err.(*url.Error); ok {
 			if strings.Contains(err.Error(), "context deadline exceeded") {
-				fmt.Printf("\n%s: timeout\n", d)
-				return ""
+				fmt.Printf("\n%s: timeout\n", domain)
+				return "", nil
 			}
-			fmt.Printf("\n%s: %s\n", d, err)
-			return ""
+			fmt.Printf("\n%s: %s\n", domain, err)
+			return "", nil
 		}
-		log.Fatalf("\n%s error: %s\n", domain, err)
+		return "", fmt.Errorf("%s error: %s", domain, err)
 	}
 
-	return s
+	return s, nil
 }
 
-func get(d string) (string, error) {
-	c := &http.Client{
-		Timeout: timeout * time.Second,
-	}
-	ctx := context.Background()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+path.Join(d, "ip.json"), nil)
+func request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return "", err
 	}
-	resp, err := c.Do(req)
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
+
+	//log.Printf("\nReceived %d from %s\n", resp.StatusCode, url)
+
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("%s, %w", strings.ToLower(resp.Status), ErrStatus)
 	}
+
 	r, err := parse(resp.Body)
 	if err != nil {
 		return "", err
 	}
+
 	if ok, err := r.valid(); !ok {
 		return r.IP, err
 	}
