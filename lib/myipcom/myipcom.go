@@ -146,16 +146,12 @@ func valid(ipv6 bool, s string) (bool, error) {
 		return false, ErrInvalid
 	}
 
-	if ip.To4() == nil {
+	if !ipv6 && ip.To4() == nil {
 		return false, ErrNoIPv4
 	}
-
-	// if !ipv6 && ip.To4() == nil {
-	// 	return false, ErrNoIPv4
-	// }
-	// if ipv6 && ip.To16() == nil {
-	// 	return false, ErrNoIPv6
-	// }
+	if ipv6 && ip.To16() == nil {
+		return false, ErrNoIPv6
+	}
 
 	return true, nil
 }
