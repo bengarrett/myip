@@ -38,7 +38,7 @@ const domain = "api.myip.com"
 // IPv4 returns the Internet facing IP address using the free myip.com service.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	s, err := request(ctx, cancel, link)
-	if err == nil && ctx.Err() == context.Canceled {
+	if s == "" && ctx.Err() == context.Canceled {
 		return "", nil
 	}
 	if err != nil {

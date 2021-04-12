@@ -28,7 +28,7 @@ const domain = "api.ipify.org"
 // IPv4 returns the Internet facing IP address using the free ipify.org service.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	b, err := request(ctx, cancel, link)
-	if err == nil && ctx.Err() == context.Canceled {
+	if b == nil && ctx.Err() == context.Canceled {
 		return "", nil
 	}
 	if err != nil {

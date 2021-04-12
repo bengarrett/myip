@@ -122,7 +122,7 @@ func info() {
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	timeout := time.Duration(p.mode.timeout) * time.Microsecond
+	timeout := time.Duration(p.mode.timeout) * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	go p.worker(ctx, cancel, job1, c)
 	go p.worker(ctx, cancel, job2, c)
@@ -168,6 +168,7 @@ func (p ping) count() string {
 	// standard prints the ip addresses with request complete counts
 	total := 4
 	if p.mode.first {
+		p.complete = 1
 		total = 1
 	}
 	if p.complete == 0 {

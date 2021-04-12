@@ -42,7 +42,7 @@ const domain = "api4.my-ip.io"
 // IPv4 returns the Internet facing IP address of the free my-ip.io service.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	r, err := request(ctx, cancel, link)
-	if err == nil && ctx.Err() == context.Canceled {
+	if r.IP == "" && ctx.Err() == context.Canceled {
 		return "", nil
 	}
 	if err != nil {
