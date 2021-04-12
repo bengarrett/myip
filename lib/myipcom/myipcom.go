@@ -38,13 +38,13 @@ const domain = "api.myip.com"
 // IPv4 returns the Internet facing IP address using the free myip.com service.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	s, err := request(ctx, cancel, link)
-	if s == "" && ctx.Err() == context.Canceled {
+	if s == "" && err == nil && ctx.Err() == context.Canceled {
 		return "", nil
 	}
 	if err != nil {
 		switch errors.Unwrap(err) {
 		case context.DeadlineExceeded:
-			fmt.Printf("\n%s: timeout\n", domain)
+			fmt.Printf("\n%s: timeout", domain)
 			return "", nil
 		default:
 			return "", fmt.Errorf("%s error: %s", domain, err)

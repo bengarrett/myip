@@ -8,19 +8,20 @@ import (
 const (
 	example = "93.184.216.34"
 	norwell = "93.184.216.34, Norwell, United States"
+	timeout = 5000
 )
 
 //nolint:unparam
 func BenchmarkStd(b *testing.B) {
 	var p ping
-	p.mode.timeout = 5
+	p.mode.timeout = timeout
 	p.standard()
 }
 
 //nolint:unparam
 func BenchmarkFirst(b *testing.B) {
 	var p ping
-	p.mode.timeout = 5
+	p.mode.timeout = timeout
 	p.mode.first = true
 	p.first()
 }
@@ -28,7 +29,7 @@ func BenchmarkFirst(b *testing.B) {
 //nolint:unparam
 func BenchmarkSimple(b *testing.B) {
 	var p ping
-	p.mode.timeout = 5
+	p.mode.timeout = timeout
 	p.mode.simple = true
 	p.standard()
 }
@@ -36,7 +37,7 @@ func BenchmarkSimple(b *testing.B) {
 //nolint:unparam
 func BenchmarkSimpleAndFirst(b *testing.B) {
 	var p ping
-	p.mode.timeout = 5
+	p.mode.timeout = timeout
 	p.mode.first = true
 	p.mode.simple = true
 	p.first()
@@ -62,7 +63,7 @@ func Test_self(t *testing.T) {
 
 func Test_ping_count(t *testing.T) {
 	e := []string{}
-	timeout := int64(5)
+	timeout := int64(timeout)
 	first := modes{true, false, timeout}
 	std := modes{false, false, timeout}
 	simp := modes{false, true, timeout}

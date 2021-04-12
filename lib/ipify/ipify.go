@@ -28,13 +28,13 @@ const domain = "api.ipify.org"
 // IPv4 returns the Internet facing IP address using the free ipify.org service.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	b, err := request(ctx, cancel, link)
-	if b == nil && ctx.Err() == context.Canceled {
+	if b == nil && err == nil && ctx.Err() == context.Canceled {
 		return "", nil
 	}
 	if err != nil {
 		switch errors.Unwrap(err) {
 		case context.DeadlineExceeded:
-			fmt.Printf("\n%s: timeout\n", domain)
+			fmt.Printf("\n%s: timeout", domain)
 			return "", nil
 		default:
 			return "", fmt.Errorf("%s error: %s", domain, err)

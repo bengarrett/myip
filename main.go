@@ -48,7 +48,7 @@ func main() {
 	var p ping
 	flag.BoolVar(&p.mode.first, "first", false, "returns the first reported IP address and its location")
 	flag.BoolVar(&p.mode.simple, "simple", false, "simple mode only displays the IP address")
-	flag.Int64Var(&p.mode.timeout, "timeout", 5, "https request timeout in seconds (default: 5)")
+	flag.Int64Var(&p.mode.timeout, "timeout", 5000, "https request timeout in milliseconds (default: 5000 [5 seconds])")
 	ver := flag.Bool("version", false, "version and information for this program")
 	f := flag.Bool("f", false, "alias for first")
 	s := flag.Bool("s", false, "alias for simple")
@@ -122,7 +122,7 @@ func info() {
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	timeout := time.Duration(p.mode.timeout) * time.Second
+	timeout := time.Duration(p.mode.timeout) * time.Millisecond
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	go p.worker(ctx, cancel, job1, c)
 	go p.worker(ctx, cancel, job2, c)
@@ -140,7 +140,7 @@ func (p ping) first() {
 func (p ping) standard() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	timeout := time.Duration(p.mode.timeout) * time.Second
+	timeout := time.Duration(p.mode.timeout) * time.Millisecond
 	ctx1, cancel1 := context.WithTimeout(context.Background(), timeout)
 	ctx2, cancel2 := context.WithTimeout(context.Background(), timeout)
 	ctx3, cancel3 := context.WithTimeout(context.Background(), timeout)
@@ -168,11 +168,13 @@ func (p ping) count() string {
 	// standard prints the ip addresses with request complete counts
 	total := 4
 	if p.mode.first {
-		p.complete = 1
 		total = 1
 	}
 	if p.complete == 0 {
 		return fmt.Sprintf("(0/%d) ", total)
+	}
+	if p.mode.first {
+		p.complete = 1
 	}
 	// (1/4) 93.184.216.34, Norwell, United States
 	return fmt.Sprintf("\r(%d/%d) %s", p.complete, total, p.Print)
