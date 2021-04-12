@@ -129,6 +129,19 @@ func (p ping) first() {
 	c := make(chan string)
 	timeout := time.Duration(p.mode.timeout) * time.Millisecond
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	if p.mode.ipv6 {
+		go p.workerV6(ctx, cancel, job1, c)
+		go p.workerV6(ctx, cancel, job2, c)
+		go p.workerV6(ctx, cancel, job3, c)
+		go p.workerV6(ctx, cancel, job4, c)
+		<-c
+		cancel()
+		<-c
+		<-c
+		<-c
+		fmt.Println()
+		return
+	}
 	go p.workerV4(ctx, cancel, job1, c)
 	go p.workerV4(ctx, cancel, job2, c)
 	go p.workerV4(ctx, cancel, job3, c)
