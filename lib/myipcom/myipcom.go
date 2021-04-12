@@ -85,6 +85,9 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 			fmt.Printf("\n%s: timeout", domain)
 			return "", nil
 		default:
+			if ctx.Err() == context.Canceled {
+				return "", nil
+			}
 			return "", fmt.Errorf("%s error: %s", domain, err)
 		}
 	}
