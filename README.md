@@ -46,13 +46,14 @@ scoop install bengarrett/myip
 
 ```sh
 myip -help
-# Usage of myip:
-#   -first
-#     	Returns the first reported IP address, its location and exits.
-#   -simple
-#     	Simple mode only displays an IP address and exits.
-#   -version
-#     	Version and information for this program.
+# MyIP Usage:
+#     myip [options]:
+#
+#     -h, --help       show this list of options
+#     -f, --first      returns the first reported IP address and its location
+#     -s, --simple     simple mode only displays the IP address
+#     -t, --timeout    https request timeout in milliseconds (default: 5000 [5 seconds])
+#     -v, --version    version and information for this program
 ```
 
 ```sh
@@ -81,10 +82,8 @@ myip -simple -first
 # 93.184.216.34
 ```
 
-#### Timeout example
-
 ```sh
-myip
+myip -timeout=900
 # (1/4) 93.184.216.34, Norwell, United States
 # ip4.seeip.org: timeout
 # (3/4) 93.184.216.34, Norwell, United States
@@ -114,3 +113,14 @@ env GOOS=openbsd GOARCH=amd64 go build
 # target and build for Linux on MIPS CPUs
 env GOOS=linux GOARCH=mips64 go build
 ```
+
+---
+
+#### MyIP uses the following online APIs.
+
+- [ipify API](https://www.ipify.org)
+- [MYIP.com](https://www.myip.com)
+- [Workshell MyIP](https://www.my-ip.io)
+- [SeeIP](https://seeip.org)
+
+I found [Steve Azzopardi's excellent _import "context"_](https://steveazz.xyz/blog/import-context/) post useful for understanding context library in Go.
