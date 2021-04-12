@@ -24,8 +24,9 @@ type ping struct {
 }
 
 type modes struct {
-	first  bool
-	simple bool
+	first   bool
+	simple  bool
+	timeout int64
 }
 
 type jobs uint8
@@ -47,9 +48,11 @@ func main() {
 	var p ping
 	flag.BoolVar(&p.mode.first, "first", false, "returns the first reported IP address and its location")
 	flag.BoolVar(&p.mode.simple, "simple", false, "simple mode only displays the IP address")
+	flag.Int64Var(&p.mode.timeout, "timeout", 5, "https request timeout in seconds (default: 5)")
 	ver := flag.Bool("version", false, "version and information for this program")
 	f := flag.Bool("f", false, "alias for first")
 	s := flag.Bool("s", false, "alias for simple")
+	t := flag.Int64("t", 0, "alias for timeout")
 	v := flag.Bool("v", false, "alias for version")
 
 	flag.Usage = func() {
@@ -77,6 +80,10 @@ func main() {
 	// simple alias
 	if *s {
 		p.mode.simple = true
+	}
+	// timeout alias
+	if *t > 0 {
+		p.mode.timeout = *t
 	}
 	// first mode
 	if p.mode.first || *f {
@@ -115,7 +122,8 @@ func info() {
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	ctx, cancel := context.WithCancel(context.Background())
+	timeout := time.Duration(p.mode.timeout) * time.Microsecond
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	go p.worker(ctx, cancel, job1, c)
 	go p.worker(ctx, cancel, job2, c)
 	go p.worker(ctx, cancel, job3, c)
@@ -132,14 +140,15 @@ func (p ping) first() {
 func (p ping) standard() {
 	fmt.Print(p.count())
 	c := make(chan string)
-	ctx1, to1 := context.WithTimeout(context.Background(), 1*time.Second)
-	ctx2, to2 := context.WithTimeout(context.Background(), 5*time.Second)
-	ctx3, to3 := context.WithTimeout(context.Background(), 5*time.Second)
-	ctx4, to4 := context.WithTimeout(context.Background(), 5*time.Second)
-	go p.worker(ctx1, to1, job1, c)
-	go p.worker(ctx2, to2, job2, c)
-	go p.worker(ctx3, to3, job3, c)
-	go p.worker(ctx4, to4, job4, c)
+	timeout := time.Duration(p.mode.timeout) * time.Second
+	ctx1, cancel1 := context.WithTimeout(context.Background(), timeout)
+	ctx2, cancel2 := context.WithTimeout(context.Background(), timeout)
+	ctx3, cancel3 := context.WithTimeout(context.Background(), timeout)
+	ctx4, cancel4 := context.WithTimeout(context.Background(), timeout)
+	go p.worker(ctx1, cancel1, job1, c)
+	go p.worker(ctx2, cancel2, job2, c)
+	go p.worker(ctx3, cancel3, job3, c)
+	go p.worker(ctx4, cancel4, job4, c)
 	<-c
 	<-c
 	<-c
