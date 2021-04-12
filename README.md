@@ -123,4 +123,7 @@ env GOOS=linux GOARCH=mips64 go build
 - [Workshell MyIP](https://www.my-ip.io)
 - [SeeIP](https://seeip.org)
 
+The IP region data is from GeoLite2 created by MaxMind, available from
+[maxmind.com](https://www.maxmind.com).
+
 I found [Steve Azzopardi's excellent _import "context"_](https://steveazz.xyz/blog/import-context/) post useful for understanding context library in Go.
