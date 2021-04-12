@@ -13,12 +13,14 @@ const (
 //nolint:unparam
 func BenchmarkStd(b *testing.B) {
 	var p ping
+	p.mode.timeout = 5
 	p.standard()
 }
 
 //nolint:unparam
 func BenchmarkFirst(b *testing.B) {
 	var p ping
+	p.mode.timeout = 5
 	p.mode.first = true
 	p.first()
 }
@@ -26,6 +28,7 @@ func BenchmarkFirst(b *testing.B) {
 //nolint:unparam
 func BenchmarkSimple(b *testing.B) {
 	var p ping
+	p.mode.timeout = 5
 	p.mode.simple = true
 	p.standard()
 }
@@ -33,6 +36,7 @@ func BenchmarkSimple(b *testing.B) {
 //nolint:unparam
 func BenchmarkSimpleAndFirst(b *testing.B) {
 	var p ping
+	p.mode.timeout = 5
 	p.mode.first = true
 	p.mode.simple = true
 	p.first()
@@ -58,9 +62,10 @@ func Test_self(t *testing.T) {
 
 func Test_ping_count(t *testing.T) {
 	e := []string{}
-	first := modes{true, false}
-	std := modes{false, false}
-	simp := modes{false, true}
+	timeout := int64(5)
+	first := modes{true, false, timeout}
+	std := modes{false, false, timeout}
+	simp := modes{false, true, timeout}
 	type fields struct {
 		results  []string
 		complete int
