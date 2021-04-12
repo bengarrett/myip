@@ -81,7 +81,7 @@ func TestResult_valid(t *testing.T) {
 	}{
 		{"no ip", "", false, ErrNoIP},
 		{"invalid", "1.1", false, ErrInvalid},
-		{"ipv6", "2001:db8:8714:3a90::12", false, ErrNoIPv4},
+		{"ipv6", "2001:db8:8714:3a90::12", true, nil},
 		{"ipv4", "1.1.1.1", true, nil},
 	}
 	for _, tt := range tests {
