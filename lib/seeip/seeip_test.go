@@ -29,9 +29,9 @@ func TestCancel(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	want := context.Canceled
-	_, err := IPv4(ctx, cancel)
-	if err == nil {
-		t.Errorf("IPv4() error = %v, want error string", err)
+	s, err := IPv4(ctx, cancel)
+	if s != "" || err != nil {
+		t.Errorf("IPv4() s = %v, error = %v, want an empty string with no errors", s, err)
 	}
 	if !errors.Is(ctx.Err(), want) {
 		t.Errorf("IPv4() context.error = %v, want %v", err, want)
