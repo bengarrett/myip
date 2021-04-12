@@ -9,8 +9,7 @@
 # in a terminal do the following:
 # cd myip
 # git pull
-# cd brew
-# goreleaser
+# goreleaser release  --skip-validate --rm-dist -f brew/
 #
 # test the config:
 # goreleaser check
