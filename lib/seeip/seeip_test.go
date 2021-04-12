@@ -10,7 +10,7 @@ import (
 
 func BenchmarkRequest(b *testing.B) {
 	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-	r, err := request(ctx, timeout, link)
+	r, err := request(ctx, timeout, linkv4)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -39,9 +39,8 @@ func TestCancel(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	link = "invalid url"
 	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
-	if _, err := IPv4(ctx, timeout); errors.Is(err, nil) {
+	if _, err := Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
 		t.Errorf("IPv4() = %v, want an error", err)
 	}
 }

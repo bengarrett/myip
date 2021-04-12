@@ -64,9 +64,9 @@ func Test_self(t *testing.T) {
 func Test_ping_count(t *testing.T) {
 	e := []string{}
 	timeout := int64(timeout)
-	first := modes{true, false, timeout}
-	std := modes{false, false, timeout}
-	simp := modes{false, true, timeout}
+	first := modes{true, false, false, timeout}
+	std := modes{false, false, false, timeout}
+	simp := modes{false, false, true, timeout}
 	type fields struct {
 		results  []string
 		complete int

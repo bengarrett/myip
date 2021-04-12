@@ -27,17 +27,55 @@ type Result struct {
 var (
 	ErrNoIP    = errors.New("ip address is empty")
 	ErrNoIPv4  = errors.New("ip address is not v4")
+	ErrNoIPv6  = errors.New("ip address is not v6")
 	ErrInvalid = errors.New("ip address is invalid")
 	ErrStatus  = errors.New("unusual myip.com server response")
-
-	link = "https://api.myip.com"
 )
 
-const domain = "api.myip.com"
+const (
+	domain = "api.myip.com"
+	link   = "https://api.myip.com"
+)
 
-// IPv4 returns the Internet facing IP address using the free myip.com service.
+// IPv4 returns the Internet facing IPv4 address using the free ipify.org service.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	s, err := request(ctx, cancel, link)
+	s, err := Request(ctx, cancel, link)
+	if err != nil {
+		return s, err
+	}
+
+	if s == "" {
+		return "", nil
+	}
+
+	if ok, err := valid(false, s); !ok {
+		return s, err
+	}
+
+	return s, nil
+}
+
+// IPv6 returns the Internet facing IPv6 address using the free ipify.org service.
+func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
+	s, err := Request(ctx, cancel, link)
+	if err != nil {
+		return s, err
+	}
+
+	if s == "" {
+		return "", nil
+	}
+
+	if ok, err := valid(true, s); !ok {
+		return s, err
+	}
+
+	return s, nil
+}
+
+// Request returns the Internet facing IP address using the free myip.com service.
+func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
+	s, err := request(ctx, cancel, url)
 	if s == "" && err == nil && ctx.Err() == context.Canceled {
 		return "", nil
 	}
@@ -51,11 +89,7 @@ func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 		}
 	}
 
-	if ok, err := valid(s); !ok {
-		return s, err
-	}
-
-	return s, nil
+	return s, err
 }
 
 func request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
@@ -96,17 +130,26 @@ func parse(r io.Reader) (string, error) {
 	return result.IP, nil
 }
 
-func valid(s string) (bool, error) {
+func valid(ipv6 bool, s string) (bool, error) {
 	if s == "" {
 		return false, ErrNoIP
 	}
+
 	ip := net.ParseIP(s)
 	if ip == nil {
 		return false, ErrInvalid
 	}
+
 	if ip.To4() == nil {
 		return false, ErrNoIPv4
 	}
+
+	// if !ipv6 && ip.To4() == nil {
+	// 	return false, ErrNoIPv4
+	// }
+	// if ipv6 && ip.To16() == nil {
+	// 	return false, ErrNoIPv6
+	// }
 
 	return true, nil
 }

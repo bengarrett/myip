@@ -19,15 +19,27 @@ var (
 	ErrNoIP    = errors.New("ip address is empty")
 	ErrInvalid = errors.New("ip address is invalid")
 	ErrStatus  = errors.New("unusual ipify.org server response")
-
-	link = "https://api.ipify.org"
 )
 
-const domain = "api.ipify.org"
+const (
+	domain = "ipify.org"
+	linkv4 = "https://api.ipify.org"
+	linkv6 = "https://api6.ipify.org"
+)
 
-// IPv4 returns the Internet facing IP address using the free ipify.org service.
+// IPv4 returns the Internet facing IPv4 address using the free ipify.org service.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	b, err := request(ctx, cancel, link)
+	return Request(ctx, cancel, linkv4)
+}
+
+// IPv6 returns the Internet facing IPv6 address using the free ipify.org service.
+func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
+	return Request(ctx, cancel, linkv6)
+}
+
+// Request returns the Internet facing IP address using the free ipify.org service.
+func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
+	b, err := request(ctx, cancel, url)
 	if b == nil && err == nil && ctx.Err() == context.Canceled {
 		return "", nil
 	}

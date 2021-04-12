@@ -11,7 +11,7 @@ import (
 
 func BenchmarkRequest(b *testing.B) {
 	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-	s, err := request(ctx, timeout, link)
+	s, err := request(ctx, timeout, linkv4)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -40,9 +40,8 @@ func TestCancel(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	link = "invalid url"
 	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
-	if _, err := IPv4(ctx, timeout); errors.Is(err, nil) {
+	if _, err := Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
 		t.Errorf("IPv4() = %v, want an error", err)
 	}
 }
@@ -56,7 +55,8 @@ func Test_request(t *testing.T) {
 		{"empty", "", "unsupported protocol scheme"},
 		{"html", "https://example.com", ""},
 		{"404", "https://api.ipify.org/abcdef", "404 not found"},
-		{"okay", "https://api.ipify.org", ""},
+		{"ipv4", linkv4, ""},
+		{"ipv6", linkv6, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

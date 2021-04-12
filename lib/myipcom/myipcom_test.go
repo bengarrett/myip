@@ -40,10 +40,9 @@ func TestCancel(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	link = "invalid url"
 	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
-	if _, err := IPv4(ctx, timeout); errors.Is(err, nil) {
-		t.Errorf("IPv4() = %v, want an error", err)
+	if _, err := Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
+		t.Errorf("Request() = %v, want an error", err)
 	}
 }
 
@@ -87,7 +86,7 @@ func TestResult_valid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := valid(tt.ip)
+			got, err := valid(false, tt.ip)
 			if got != tt.want {
 				t.Errorf("Result.valid() = %v, want %v", got, tt.want)
 			}

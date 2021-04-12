@@ -25,6 +25,7 @@ type ping struct {
 
 type modes struct {
 	first   bool
+	ipv6    bool
 	simple  bool
 	timeout int64
 }
@@ -47,10 +48,12 @@ var (
 func main() {
 	var p ping
 	flag.BoolVar(&p.mode.first, "first", false, "returns the first reported IP address and its location")
+	flag.BoolVar(&p.mode.ipv6, "ipv6", false, "return an IPv6 address instead of IPv4")
 	flag.BoolVar(&p.mode.simple, "simple", false, "simple mode only displays the IP address")
 	flag.Int64Var(&p.mode.timeout, "timeout", 5000, "https request timeout in milliseconds (default: 5000 [5 seconds])")
 	ver := flag.Bool("version", false, "version and information for this program")
 	f := flag.Bool("f", false, "alias for first")
+	i := flag.Bool("i", false, "alias for ipv6")
 	s := flag.Bool("s", false, "alias for simple")
 	t := flag.Int64("t", 0, "alias for timeout")
 	v := flag.Bool("v", false, "alias for version")
@@ -77,11 +80,13 @@ func main() {
 		info()
 		return
 	}
-	// simple alias
+	// aliases
+	if *i {
+		p.mode.ipv6 = true
+	}
 	if *s {
 		p.mode.simple = true
 	}
-	// timeout alias
 	if *t > 0 {
 		p.mode.timeout = *t
 	}
@@ -124,10 +129,10 @@ func (p ping) first() {
 	c := make(chan string)
 	timeout := time.Duration(p.mode.timeout) * time.Millisecond
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	go p.worker(ctx, cancel, job1, c)
-	go p.worker(ctx, cancel, job2, c)
-	go p.worker(ctx, cancel, job3, c)
-	go p.worker(ctx, cancel, job4, c)
+	go p.workerV4(ctx, cancel, job1, c)
+	go p.workerV4(ctx, cancel, job2, c)
+	go p.workerV4(ctx, cancel, job3, c)
+	go p.workerV4(ctx, cancel, job4, c)
 	<-c
 	cancel()
 	<-c
@@ -145,10 +150,22 @@ func (p ping) standard() {
 	ctx2, cancel2 := context.WithTimeout(context.Background(), timeout)
 	ctx3, cancel3 := context.WithTimeout(context.Background(), timeout)
 	ctx4, cancel4 := context.WithTimeout(context.Background(), timeout)
-	go p.worker(ctx1, cancel1, job1, c)
-	go p.worker(ctx2, cancel2, job2, c)
-	go p.worker(ctx3, cancel3, job3, c)
-	go p.worker(ctx4, cancel4, job4, c)
+	if p.mode.ipv6 {
+		go p.workerV6(ctx1, cancel1, job1, c)
+		go p.workerV6(ctx2, cancel2, job2, c)
+		go p.workerV6(ctx3, cancel3, job3, c)
+		go p.workerV6(ctx4, cancel4, job4, c)
+		<-c
+		<-c
+		<-c
+		<-c
+		fmt.Println()
+		return
+	}
+	go p.workerV4(ctx1, cancel1, job1, c)
+	go p.workerV4(ctx2, cancel2, job2, c)
+	go p.workerV4(ctx3, cancel3, job3, c)
+	go p.workerV4(ctx4, cancel4, job4, c)
 	<-c
 	<-c
 	<-c
@@ -180,7 +197,7 @@ func (p ping) count() string {
 	return fmt.Sprintf("\r(%d/%d) %s", p.complete, total, p.Print)
 }
 
-func (p *ping) worker(ctx context.Context, cancel context.CancelFunc, job jobs, c chan string) {
+func (p *ping) workerV4(ctx context.Context, cancel context.CancelFunc, job jobs, c chan string) {
 	var s string
 	var err error
 	switch job {
@@ -195,6 +212,26 @@ func (p *ping) worker(ctx context.Context, cancel context.CancelFunc, job jobs, 
 	}
 	if err != nil {
 		log.Fatalf("\n%s\n", err)
+	}
+	fmt.Print(p.parse(s))
+	c <- s
+}
+
+func (p *ping) workerV6(ctx context.Context, cancel context.CancelFunc, job jobs, c chan string) {
+	var s string
+	var err error
+	switch job {
+	case job1:
+		s, err = ipify.IPv6(ctx, cancel)
+	case job2:
+		s, err = myipcom.IPv6(ctx, cancel)
+	case job3:
+		s, err = myipio.IPv6(ctx, cancel)
+	case job4:
+		s, err = seeip.IPv6(ctx, cancel)
+	}
+	if err != nil {
+		log.Fatalln(err)
 	}
 	fmt.Print(p.parse(s))
 	c <- s
