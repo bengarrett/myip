@@ -2,6 +2,7 @@ package seeip
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -9,39 +10,39 @@ import (
 
 func BenchmarkRequest(b *testing.B) {
 	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-	s, err := request(ctx, timeout, link)
+	r, err := request(ctx, timeout, link)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(s)
+	fmt.Println(string(r))
 }
 
-func TestIPv4(t *testing.T) {
-	tests := []struct {
-		name    string
-		domain  string
-		isValid bool
-		wantErr bool
-	}{
-		{"empty", "", false, true},
-		{"html", "https://example.com", false, true},
-		{"404", link + "/abcdef", false, true},
-		{"okay", link, true, false},
+func TestTimeout(t *testing.T) {
+	ctx, timeout := context.WithTimeout(context.Background(), 0*time.Second)
+	if _, err := IPv4(ctx, timeout); !errors.Is(err, nil) {
+		t.Errorf("IPv4() = %v, want %v", err, nil)
 	}
-	for _, tt := range tests {
-		d := tt.domain
-		t.Run(tt.name, func(t *testing.T) {
-			ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-			gotS, err := request(ctx, timeout, d)
-			if bool(err != nil) != tt.wantErr {
-				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
-			}
-			gotV, _ := valid(gotS)
-			if gotV != tt.isValid {
-				t.Errorf("get() = %v, want %v", gotS, tt.isValid)
-			}
-		})
+}
+
+func TestCancel(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	want := context.Canceled
+	_, err := IPv4(ctx, cancel)
+	if err == nil {
+		t.Errorf("IPv4() error = %v, want error string", err)
+	}
+	if !errors.Is(ctx.Err(), want) {
+		t.Errorf("IPv4() context.error = %v, want %v", err, want)
+	}
+}
+
+func TestError(t *testing.T) {
+	link = "invalid url"
+	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
+	if _, err := IPv4(ctx, timeout); errors.Is(err, nil) {
+		t.Errorf("IPv4() = %v, want an error", err)
 	}
 }
 
