@@ -14,7 +14,7 @@ func BenchmarkRequest(b *testing.B) {
 		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
 		r, err := request(ctx, timeout, linkv4)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 		fmt.Println(string(r))
@@ -28,7 +28,7 @@ func ExampleIPv4() {
 
 	s, err := IPv4(ctx, cancel)
 	if err != nil {
-		log.Fatalf("\n%s\n", err)
+		log.Printf("\n%s\n", err)
 	}
 	fmt.Println(s)
 }

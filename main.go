@@ -43,9 +43,9 @@ const (
 )
 
 var (
-	version = "0.0.0" // nolint:gochecknoglobals
-	commit  = "unset" // nolint:gochecknoglobals
-	date    = "unset" // nolint:gochecknoglobals
+	version = "0.0.0"
+	commit  = "unset" // nolint: gochecknoglobals
+	date    = "unset" // nolint: gochecknoglobals
 )
 
 func main() {
@@ -126,7 +126,7 @@ func info() {
 }
 
 // Fast waits for the fastest concurrent request to complete
-// before aborting and cancelling the others.
+// before aborting and canceling the others.
 func (p ping) first() {
 	fmt.Print(p.count())
 	c := make(chan string)

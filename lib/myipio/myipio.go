@@ -37,6 +37,7 @@ var (
 	ErrNoIPv4    = errors.New("ip address is not ipv4")
 	ErrNoIPv6    = errors.New("ip address is not ipv6")
 	ErrInvalid   = errors.New("ip address is invalid")
+	ErrRequest   = errors.New("myip.com error")
 	ErrStatus    = errors.New("unusual my-ip.io server response")
 )
 
@@ -60,7 +61,7 @@ func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
 // Request the seeip API URL and return a valid IPv4 or IPv6 address.
 func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
 	r, err := request(ctx, cancel, url)
-	if r.IP == "" && err == nil && ctx.Err() == context.Canceled {
+	if r.IP == "" && err == nil && errors.Is(ctx.Err(), context.Canceled) {
 		return "", nil
 	}
 	if err != nil {
@@ -69,13 +70,14 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 			fmt.Printf("\n%s: timeout", domain)
 			return "", nil
 		default:
-			if err == nil && ctx.Err() == context.Canceled {
+			if err == nil && errors.Is(ctx.Err(), context.Canceled) {
 				return "", nil
 			}
-			if errors.Unwrap(err) == context.Canceled {
+			if errors.Is(errors.Unwrap(err), context.Canceled) {
 				return "", nil
 			}
-			return "", fmt.Errorf("%s error: %s", domain, err)
+			e := fmt.Errorf("%w: %s", ErrRequest, err)
+			return "", e
 		}
 	}
 
@@ -99,8 +101,6 @@ func request(ctx context.Context, cancel context.CancelFunc, url string) (Result
 		return Result{}, err
 	}
 	defer resp.Body.Close()
-
-	//log.Printf("\nReceived %d from %s\n", resp.StatusCode, url)
 
 	if resp.StatusCode != http.StatusOK {
 		return Result{}, fmt.Errorf("%s, %w", strings.ToLower(resp.Status), ErrStatus)

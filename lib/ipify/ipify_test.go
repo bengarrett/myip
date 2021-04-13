@@ -29,7 +29,7 @@ func ExampleIPv4() {
 
 	s, err := IPv4(ctx, cancel)
 	if err != nil {
-		log.Fatalf("\n%s\n", err)
+		log.Printf("\n%s\n", err)
 	}
 	fmt.Println(s)
 }
