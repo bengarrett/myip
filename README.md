@@ -1,6 +1,7 @@
 # MyIP Tetrad
 
-[![goreleaser](https://github.com/bengarrett/myip/actions/workflows/release.yml/badge.svg)](https://github.com/bengarrett/myip/actions/workflows/release.yml)
+[![goreleaser](https://github.com/bengarrett/myip/actions/workflows/release.yml/badge.svg)](https://github.com/bengarrett/myip/actions/workflows/release.yml) &nbsp; 
+[![Go Reference](https://pkg.go.dev/badge/github.com/bengarrett/myip.svg)](https://pkg.go.dev/github.com/bengarrett/myip)
 
 MyIP Tetrad is a simple to use terminal tool to determine your Internet-facing IP address and location from four remote sources. Developed on Go, it's a portable self-contained binary with no dependencies.
 
