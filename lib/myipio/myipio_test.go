@@ -88,7 +88,7 @@ func TestCancel(t *testing.T) {
 func TestError(t *testing.T) {
 	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
 	if _, err := Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
-		t.Errorf("IPv4() = %v, want an error", err)
+		t.Errorf("Request() = %v, want an error", err)
 	}
 }
 
@@ -109,10 +109,10 @@ func Test_request(t *testing.T) {
 			ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
 			gotS, err := request(ctx, timeout, tt.domain)
 			if err != nil && tt.wantErr != "" && !strings.Contains(fmt.Sprint(err), tt.wantErr) {
-				t.Errorf("get() error = %v, want %v", err, tt.wantErr)
+				t.Errorf("request() error = %v, want %v", err, tt.wantErr)
 			}
 			if bool(gotS.IP != "") != tt.isValid {
-				t.Errorf("get() = %v, want an ip addr: %v", gotS, tt.isValid)
+				t.Errorf("request() = %v, want an ip addr: %v", gotS, tt.isValid)
 			}
 		})
 	}
@@ -147,11 +147,11 @@ func TestResult_valid(t *testing.T) {
 			}
 			got, err := r.valid(linkv4)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("Result.valid() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("valid() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Result.valid() = %v, want %v", got, tt.want)
+				t.Errorf("valid() = %v, want %v", got, tt.want)
 			}
 		})
 	}

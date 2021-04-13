@@ -89,7 +89,7 @@ func TestCancel(t *testing.T) {
 func TestError(t *testing.T) {
 	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
 	if _, err := Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
-		t.Errorf("IPv4() = %v, want an error", err)
+		t.Errorf("Request() = %v, want an error", err)
 	}
 }
 
