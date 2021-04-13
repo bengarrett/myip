@@ -1,3 +1,7 @@
+// Package seeip returns your Internet-facing IPv4 or IPv6
+// address, sourced from the SeeIP API.
+// https://seeip.org
+// © Ben Garrett https://github.com/bengarrett/myip
 package seeip
 
 import (
@@ -27,17 +31,18 @@ const (
 	linkv6 = "https://ip6.seeip.org"
 )
 
-// IPv4 returns the Internet facing IPv4 address using the free ipify.org service.
+// IPv4 returns the clients online IP address.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	return Request(ctx, cancel, linkv4)
 }
 
-// IPv6 returns the Internet facing IPv6 address using the free ipify.org service.
+// IPv6 returns the clients online IP address. Using this on a network
+// that does not support IPv6 will result in an error.
 func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	return Request(ctx, cancel, linkv6)
 }
 
-// Request returns the Internet facing IP address using the free seeip.org service.
+// Request the seeip API URL and return a valid IPv4 or IPv6 address.
 func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
 	b, err := request(ctx, cancel, url)
 	if b == nil && err == nil && ctx.Err() == context.Canceled {

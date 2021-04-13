@@ -1,3 +1,7 @@
+// Package myipcom returns your Internet-facing IPv4 or IPv6
+// address, sourced from the MYIP.com API.
+// https://www.myip.com
+// © Ben Garrett https://github.com/bengarrett/myip
 package myipcom
 
 import (
@@ -17,7 +21,7 @@ import (
 // {"ip":"118.209.50.85","country":"Australia","cc":"AU"}
 // Note: The returned IP address can be either v4 or v6.
 
-// Result of IPv4 query.
+// Result of query.
 type Result struct {
 	IP      string `json:"ip"`
 	Country string `json:"country"`
@@ -37,7 +41,7 @@ const (
 	link   = "https://api.myip.com"
 )
 
-// IPv4 returns the Internet facing IPv4 address using the free ipify.org service.
+// IPv4 returns the clients online IP address.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	s, err := Request(ctx, cancel, link)
 	if err != nil {
@@ -55,7 +59,8 @@ func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	return s, nil
 }
 
-// IPv6 returns the Internet facing IPv6 address using the free ipify.org service.
+// IPv6 returns the clients online IP address. Using this on a network
+// that does not support IPv6 will result in an error.
 func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	s, err := Request(ctx, cancel, link)
 	if err != nil {
@@ -73,7 +78,7 @@ func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
 	return s, nil
 }
 
-// Request returns the Internet facing IP address using the free myip.com service.
+// Request the seeip API URL and return a valid IPv4 or IPv6 address.
 func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
 	s, err := request(ctx, cancel, url)
 	if s == "" && err == nil && ctx.Err() == context.Canceled {
@@ -145,11 +150,13 @@ func valid(ipv6 bool, s string) (bool, error) {
 	if ip == nil {
 		return false, ErrInvalid
 	}
-
 	if ipv6 && ip.To16() == nil {
 		return false, ErrNoIPv6
 	}
-	if ip.To16() != nil {
+	if ipv6 && ip.To16().Equal(ip.To4()) {
+		return false, ErrNoIPv6
+	}
+	if !ip.To16().Equal(ip.To4()) {
 		return true, nil
 	}
 	if ip.To4() == nil {

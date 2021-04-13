@@ -4,18 +4,66 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"testing"
 	"time"
 )
 
 func BenchmarkRequest(b *testing.B) {
-	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-	r, err := request(ctx, timeout, linkv4)
-	if err != nil {
-		fmt.Println(err)
-		return
+	for i := 0; i < b.N; i++ {
+		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
+		r, err := request(ctx, timeout, linkv4)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(r))
 	}
-	fmt.Println(string(r))
+}
+
+// ExampleIPv4 demonstrates an IPv4 address request with a 5 second timeout.
+func ExampleIPv4() {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	s, err := IPv4(ctx, cancel)
+	if err != nil {
+		log.Fatalf("\n%s\n", err)
+	}
+	fmt.Println(s)
+}
+
+// ExampleIPv6 demonstrates cocurrent IPv4 and IPv6 address requests with a 5 second timeout.
+func ExampleIPv6() {
+	ctx4, cancel4 := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel4()
+
+	ctx6, cancel6 := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel6()
+
+	s4 := make(chan string)
+	s6 := make(chan string)
+
+	go func() {
+		s, err := IPv4(ctx4, cancel4)
+		if err != nil {
+			log.Printf("\n%s\n", err)
+		}
+		s4 <- s
+	}()
+
+	go func() {
+		s, err := IPv6(ctx6, cancel6)
+		if err != nil {
+			log.Printf("\n%s\n", err)
+		}
+		s6 <- s
+	}()
+
+	ip4 := <-s4
+	ip6 := <-s6
+	fmt.Println(ip4)
+	fmt.Println(ip6)
 }
 
 func TestTimeout(t *testing.T) {
