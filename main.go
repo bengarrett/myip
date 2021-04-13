@@ -1,3 +1,6 @@
+// Package main determine your Internet-facing
+// IP address and location from multiple sources.
+// © Ben Garrett https://github.com/bengarrett/myip
 package main
 
 import (
