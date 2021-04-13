@@ -3,6 +3,7 @@ package geolite2
 import (
 	_ "embed"
 	"fmt"
+	"log"
 	"testing"
 )
 
@@ -31,6 +32,24 @@ func BenchmarkCity(b *testing.B) {
 		return
 	}
 	fmt.Println(s)
+}
+
+func ExampleCity() {
+	s, err := City("93.184.216.34")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(s)
+	// Output: Norwell, United States
+}
+
+func ExampleCountry() {
+	s, err := Country("93.184.216.34")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(s)
+	// Output: United States
 }
 
 func TestLocations(t *testing.T) {

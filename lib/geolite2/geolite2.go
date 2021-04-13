@@ -1,3 +1,8 @@
+// Package geolite2 returns the city or country location
+// of an IP address.
+// The IP region data is from GeoLite2 created by MaxMind,
+// available from https://www.maxmind.com.
+// © Ben Garrett https://github.com/bengarrett/myip
 package geolite2
 
 import (
