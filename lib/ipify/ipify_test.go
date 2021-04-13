@@ -11,13 +11,15 @@ import (
 )
 
 func BenchmarkRequest(b *testing.B) {
-	ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-	s, err := request(ctx, timeout, linkv4)
-	if err != nil {
-		fmt.Println(err)
-		return
+	for i := 0; i < b.N; i++ {
+		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
+		s, err := request(ctx, timeout, linkv4)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(s))
 	}
-	fmt.Println(string(s))
 }
 
 // ExampleIPv4 demonstrates an IPv4 address request with a 5 second timeout.
