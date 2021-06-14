@@ -18,8 +18,8 @@ brew install bengarrett/homebrew-myip/myip
 
 ##### Windows [Scoop](https://scoop.sh/)
 ```sh
-scoop bucket add bengarrett https://github.com/bengarrett/myip.git
-scoop install bengarrett/myip
+scoop bucket add myip https://github.com/bengarrett/myip.git
+scoop install myip
 ```
 
 ### Intel
