@@ -56,12 +56,16 @@ var (
 )
 
 func main() {
+	msInSec := func(i int) int {
+		const second = 1000
+		return i / second
+	}
 	var p ping
 	flag.BoolVar(&p.mode.first, "first", false, "returns the first reported IP address and its location")
 	flag.BoolVar(&p.mode.ipv6, "ipv6", false, "return an IPv6 address instead of IPv4")
 	flag.BoolVar(&p.mode.simple, "simple", false, "simple mode only displays the IP address")
 	flag.Int64Var(&p.mode.timeout, "timeout", httpTimeout,
-		fmt.Sprintf("https request timeout in milliseconds (default: %d [%d seconds])", httpTimeout, httpTimeout/1000))
+		fmt.Sprintf("https request timeout in milliseconds (default: %d [%d seconds])", httpTimeout, msInSec(httpTimeout)))
 	ver := flag.Bool("version", false, "version and information for this program")
 	f := flag.Bool("f", false, "alias for first")
 	i := flag.Bool("i", false, "alias for ipv6")
