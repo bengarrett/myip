@@ -86,20 +86,18 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 		return "", nil
 	}
 	if err != nil {
-		switch errors.Unwrap(err) {
-		case context.DeadlineExceeded:
+		if errors.Is(err, context.DeadlineExceeded) {
 			fmt.Printf("\n%s: timeout", domain)
 			return "", nil
-		default:
-			if err == nil && errors.Is(ctx.Err(), context.Canceled) {
-				return "", nil
-			}
-			if errors.Is(errors.Unwrap(err), context.Canceled) {
-				return "", nil
-			}
-			e := fmt.Errorf("%w: %s", ErrRequest, err)
-			return "", e
 		}
+		if err == nil && errors.Is(ctx.Err(), context.Canceled) {
+			return "", nil
+		}
+		if errors.Is(errors.Unwrap(err), context.Canceled) {
+			return "", nil
+		}
+		e := fmt.Errorf("%w: %s", ErrRequest, err)
+		return "", e
 	}
 
 	return s, err
