@@ -23,3 +23,4 @@ linters-settings:
 
 # Fixes
 # gofumpt -l -w <file>
+# gci -w <file>
