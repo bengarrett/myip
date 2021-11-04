@@ -1,6 +1,6 @@
 # MyIP Tetrad
 
-[![goreleaser](https://github.com/bengarrett/myip/actions/workflows/release.yml/badge.svg)](https://github.com/bengarrett/myip/actions/workflows/release.yml) &nbsp; 
+[![goreleaser](https://github.com/bengarrett/myip/actions/workflows/release.yml/badge.svg)](https://github.com/bengarrett/myip/actions/workflows/release.yml) &nbsp;
 [![Go Reference](https://pkg.go.dev/badge/github.com/bengarrett/myip.svg)](https://pkg.go.dev/github.com/bengarrett/myip)
 
 MyIP Tetrad is a simple to use terminal tool to determine your Internet-facing IP address and location from four remote sources. Developed on Go, it's a portable self-contained binary with no dependencies.
@@ -8,6 +8,12 @@ MyIP Tetrad is a simple to use terminal tool to determine your Internet-facing I
 It is an excellent tool for quickly determining if your machine or network is connected to the Internet or to see if a VPN is activated.
 
 ## Downloads
+
+[Windows](https://github.com/bengarrett/myip/releases/latest/download/myip_Windows_Intel.zip),
+[macOS](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_all.tar.gz),
+[Linux](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_Intel.tar.gz),
+[FreeBSD](https://github.com/bengarrett/myip/releases/latest/download/myip_FreeBSD_Intel.tar.gz),
+[Raspberry Pi](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_arm32_.tar.gz)
 
 ### Packages
 
@@ -22,26 +28,16 @@ scoop bucket add myip https://github.com/bengarrett/myip.git
 scoop install myip
 ```
 
-### Intel
-- [Windows](https://github.com/bengarrett/myip/releases/latest/download/myip_Windows_Intel.zip)
-- [macOS](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_Intel.tar.gz
-)
-- [FreeBSD](https://github.com/bengarrett/myip/releases/latest/download/myip_FreeBSD_Intel.tar.gz
-)
-- [Linux](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_Intel.tar.gz
-)
-- - [APK](https://github.com/bengarrett/myip/releases/latest/download/myip.apk
-) (Alpine package)<br>`apk add myip.apk`
-- - [DEB](https://github.com/bengarrett/myip/releases/latest/download/myip.deb) (Debian package)<br>`dpkg -i myip.deb`
-- - [RPM](https://github.com/bengarrett/myip/releases/latest/download/myip.rpm) (Redhat package)<br>`rpm -i myip.rpm`
+[apk](https://github.com/bengarrett/myip/releases/latest/download/myip.apk) - Alpine package, [deb](https://github.com/bengarrett/myip/releases/latest/download/myip.deb) - Debian package, [rpm](https://github.com/bengarrett/myip/releases/latest/download/myip.rpm) - Redhat package
 
-### arm
-- [macOS on Apple M chips](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_M-series.tar.gz
-)
-- [Linux arm32](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_arm32_.tar.gz
-) (Raspberry Pi and other single-board computers)
-- [Linux arm64](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_arm64.tar.gz
-)
+```sh
+# Alpine package
+apk add myip.apk
+# Debian package
+dpkg -i myip.deb
+# Redhat package
+rpm -i myip.rpm
+```
 
 ## Usage
 

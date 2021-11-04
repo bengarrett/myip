@@ -37,6 +37,11 @@ archives:
       amd64: Intel
       darwin: macOS
 
+universal_binaries:
+  - id: macOS
+    name_template: "{{ .ProjectName }}"
+    replace: true
+
 release:
   github:
     owner: bengarrett

@@ -16,7 +16,7 @@ builds:
     goarch: ['amd64']
   - id: Linux arm
     goos: ['linux']
-    goarch: ['arm', 'arm64']
+    goarch: ['arm']
   - id: macOS
     goos: ['darwin']
     goarch: ['amd64', 'arm64']
@@ -72,6 +72,11 @@ archives:
     replacements:
       amd64: Intel
       windows: Windows
+
+universal_binaries:
+  - id: macOS
+    name_template: "{{ .ProjectName }}"
+    replace: true
 
 nfpms:
   - id: Linux
