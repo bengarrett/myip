@@ -42,8 +42,12 @@ const (
 	job4
 )
 
-// Default HTTP request timeout value in milliseconds.
-const httpTimeout = 5000
+const (
+	// Default HTTP request timeout value in milliseconds.
+	httpTimeout = 5000
+	// Tabwriter padding using spaces.
+	padding = 4
+)
 
 var (
 	version = "0.0.0"
@@ -70,7 +74,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "MyIP Usage:")
 		fmt.Fprintln(os.Stderr, "    myip [options]:")
 		fmt.Fprintln(os.Stderr, "")
-		w := tabwriter.NewWriter(os.Stderr, 0, 0, 4, ' ', 0)
+		w := tabwriter.NewWriter(os.Stderr, 0, 0, padding, ' ', 0)
 		fmt.Fprintln(w, "    -h, --help\tshow this list of options")
 		flag.VisitAll(func(f *flag.Flag) {
 			if len(f.Name) == alias {
