@@ -1,17 +1,18 @@
 # .goreleaser.yml
 #
-# A specific config for homebrew releases
-# that cannot be run using Github Actions.
+# A specific config for homebrew releases that cannot be run as a Github Action.
 #
-# instructions:
-# push all changes to the github repo
-# on github publish a new release tag
-# in a terminal do the following:
-# cd myip
+# Instructions:
+# 1) Push all changes to the bengarrett/myip.
+# 2) On github publish a new release tag and let the Github Action finish.
+# 3) In a local terminal do the following:
+#
+# cd github/myip
 # git pull
-# goreleaser release  --skip-validate --rm-dist -f brew/
+# export GITHUB_TOKEN="YOUR_GH_TOKEN"
+# goreleaser release --skip-validate --rm-dist --config .brew/.goreleaser.yml
 #
-# test the config:
+# To test the config:
 # goreleaser check
 # goreleaser release --skip-publish --skip-validate --rm-dist
 
@@ -23,7 +24,7 @@ builds:
     binary: myip
     goos: ['darwin']
     goarch: ['amd64', 'arm64']
-    dir: ./../
+    dir: ./
 
 archives:
   - id: macOS
@@ -39,7 +40,7 @@ archives:
 
 universal_binaries:
   - id: macOS
-    name_template: "{{ .ProjectName }}"
+    name_template: myip
     replace: true
 
 release:
