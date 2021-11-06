@@ -19,7 +19,7 @@ It is an excellent tool for quickly determining if your machine or network is co
 
 ##### macOS [Homebrew](https://brew.sh/)
 ```sh
-brew install bengarrett/homebrew-myip/myip
+brew install bengarrett/myip/myip
 ```
 
 ##### Windows [Scoop](https://scoop.sh/)
