@@ -18,3 +18,5 @@ vendor/
 
 # Operating system specific
 .DS_Store
+
+cmd/tray

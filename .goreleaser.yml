@@ -8,66 +8,75 @@ before:
   hooks:
     - go mod tidy
 builds:
-  - id: FreeBSD
-    goos: ['freebsd']
-    goarch: ['amd64']
-  - id: Linux Intel
-    goos: ['linux']
-    goarch: ['amd64']
-  - id: Linux arm
-    goos: ['linux']
-    goarch: ['arm']
-  - id: macOS
-    goos: ['darwin']
-    goarch: ['amd64', 'arm64']
-  - id: Windows
-    goos: ['windows']
-    goarch: ['amd64']
+  - main: ./cmd/cli/
+    id: FreeBSD
+    goos: ["freebsd"]
+    goarch: ["amd64"]
+
+  - main: ./cmd/cli/
+    id: Linux Intel
+    goos: ["linux"]
+    goarch: ["amd64"]
+
+  - main: ./cmd/cli/
+    id: Linux arm
+    goos: ["linux"]
+    goarch: ["arm", "arm64"]
+
+  - main: ./cmd/cli/
+    id: macOS
+    goos: ["darwin"]
+    goarch: ["amd64", "arm64"]
+
+  - main: ./cmd/cli/
+    id: Windows
+    goos: ["windows"]
+    goarch: ["amd64"]
 
 archives:
   - id: FreeBSD
-    builds: ['FreeBSD']
+    builds: ["FreeBSD"]
     format: tar.gz
     files:
-    - none*
+      - none*
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       amd64: Intel
       freebsd: FreeBSD
   - id: Linux Intel
-    builds: ['Linux Intel']
+    builds: ["Linux Intel"]
     format: tar.gz
     files:
-    - none*
+      - none*
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       amd64: Intel
       linux: Linux
   - id: Linux arm
-    builds: ['Linux arm']
+    builds: ["Linux arm"]
     format: tar.gz
     files:
-    - none*
+      - none*
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       arm: arm32_
       arm64: arm64
       linux: Linux
   - id: macOS
-    builds: ['macOS']
+    builds: ["macOS"]
     format: tar.gz
     files:
-    - none*
+      - none*
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       arm64: M-series
       amd64: Intel
       darwin: macOS
   - id: Windows
-    builds: ['Windows']
+    builds: ["Windows"]
     format: zip
     files:
-    - none*
+      - none*
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       amd64: Intel
@@ -80,7 +89,7 @@ universal_binaries:
 
 nfpms:
   - id: Linux
-    builds: ['Linux Intel']
+    builds: ["Linux Intel"]
     file_name_template: "{{ .ProjectName }}"
     replacements:
       amd64: Intel
