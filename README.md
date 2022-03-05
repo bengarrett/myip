@@ -18,11 +18,13 @@ It is an excellent tool for quickly determining if your machine or network is co
 ### Packages
 
 ##### macOS [Homebrew](https://brew.sh/)
+
 ```sh
 brew install bengarrett/myip/myip
 ```
 
 ##### Windows [Scoop](https://scoop.sh/)
+
 ```sh
 scoop bucket add myip https://github.com/bengarrett/myip.git
 scoop install myip
@@ -95,8 +97,8 @@ myip -timeout=900
 # clone this repo
 git clone git@github.com:bengarrett/myip.git
 
-# access the repo
-cd myip
+# access the main.go
+cd myip/cmd/myip
 
 # target and build the app for the host system
 go build
