@@ -28,24 +28,24 @@ var (
 
 const (
 	domain = "ipify.org"
-	linkv4 = "https://api.ipify.org"
-	linkv6 = "https://api6.ipify.org"
+	Linkv4 = "https://api.ipify.org"
+	Linkv6 = "https://api6.ipify.org"
 )
 
 // IPv4 returns the clients online IP address.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	return Request(ctx, cancel, linkv4)
+	return Request(ctx, cancel, Linkv4)
 }
 
 // IPv6 returns the clients online IP address. Using this on a network
 // that does not support IPv6 will result in an error.
 func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	return Request(ctx, cancel, linkv6)
+	return Request(ctx, cancel, Linkv6)
 }
 
-// Request the seeip API URL and return a valid IPv4 or IPv6 address.
+// Request the ipify API and return a valid IPv4 or IPv6 address.
 func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
-	b, err := request(ctx, cancel, url)
+	b, err := RequestB(ctx, cancel, url)
 	if b == nil && err == nil && errors.Is(ctx.Err(), context.Canceled) {
 		return "", nil
 	}
@@ -65,14 +65,15 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 	}
 
 	ip := string(b)
-	if ok, err := valid(ip); !ok {
+	if err := Valid(ip); err != nil {
 		return ip, err
 	}
 
 	return ip, nil
 }
 
-func request(ctx context.Context, cancel context.CancelFunc, url string) ([]byte, error) {
+// RequestB the ipify API and return the response body.
+func RequestB(ctx context.Context, cancel context.CancelFunc, url string) ([]byte, error) {
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -98,13 +99,14 @@ func request(ctx context.Context, cancel context.CancelFunc, url string) ([]byte
 	return b, nil
 }
 
-func valid(ip string) (bool, error) {
+// Valid returns nil if ip is a valid textual representation of an IP address.
+func Valid(ip string) error {
 	if ip == "" {
-		return false, ErrNoIP
+		return ErrNoIP
 	}
 	if net.ParseIP(ip) == nil {
-		return false, ErrInvalid
+		return ErrInvalid
 	}
 
-	return true, nil
+	return nil
 }

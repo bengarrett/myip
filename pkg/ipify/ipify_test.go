@@ -1,4 +1,4 @@
-package ipify
+package ipify_test
 
 import (
 	"context"
@@ -8,17 +8,19 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/bengarrett/myip/pkg/ipify"
 )
 
 func BenchmarkRequest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-		s, err := request(ctx, timeout, linkv4)
+		b, err := ipify.RequestB(ctx, timeout, ipify.Linkv4)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println(string(s))
+		fmt.Println(string(b))
 	}
 }
 
@@ -27,7 +29,7 @@ func ExampleIPv4() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	s, err := IPv4(ctx, cancel)
+	s, err := ipify.IPv4(ctx, cancel)
 	if err != nil {
 		log.Printf("\n%s\n", err)
 	}
@@ -46,7 +48,7 @@ func ExampleIPv6() {
 	s6 := make(chan string)
 
 	go func() {
-		s, err := IPv4(ctx4, cancel4)
+		s, err := ipify.IPv4(ctx4, cancel4)
 		if err != nil {
 			log.Printf("\n%s\n", err)
 		}
@@ -54,7 +56,7 @@ func ExampleIPv6() {
 	}()
 
 	go func() {
-		s, err := IPv6(ctx6, cancel6)
+		s, err := ipify.IPv6(ctx6, cancel6)
 		if err != nil {
 			log.Printf("\n%s\n", err)
 		}
@@ -69,7 +71,7 @@ func ExampleIPv6() {
 
 func TestTimeout(t *testing.T) {
 	ctx, timeout := context.WithTimeout(context.Background(), 0*time.Second)
-	if _, err := IPv4(ctx, timeout); !errors.Is(err, nil) {
+	if _, err := ipify.IPv4(ctx, timeout); !errors.Is(err, nil) {
 		t.Errorf("IPv4() = %v, want %v", err, nil)
 	}
 }
@@ -77,7 +79,7 @@ func TestTimeout(t *testing.T) {
 func TestCancel(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	s, err := IPv4(ctx, cancel)
+	s, err := ipify.IPv4(ctx, cancel)
 	if s != "" || err != nil {
 		t.Errorf("IPv4() error = %v, want error string", err)
 	}
@@ -88,7 +90,7 @@ func TestCancel(t *testing.T) {
 
 func TestError(t *testing.T) {
 	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
-	if _, err := Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
+	if _, err := ipify.Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
 		t.Errorf("Request() = %v, want an error", err)
 	}
 }
@@ -102,13 +104,13 @@ func Test_request(t *testing.T) {
 		{"empty", "", "unsupported protocol scheme"},
 		{"html", "https://example.com", ""},
 		{"404", "https://api.ipify.org/abcdef", "404 not found"},
-		{"ipv4", linkv4, ""},
-		{"ipv6", linkv6, ""},
+		{"ipv4", ipify.Linkv4, ""},
+		{"ipv6", ipify.Linkv6, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-			_, err := request(ctx, timeout, tt.domain)
+			_, err := ipify.RequestB(ctx, timeout, tt.domain)
 			if err != nil && tt.wantErr != "" && !strings.Contains(fmt.Sprint(err), tt.wantErr) {
 				t.Errorf("request() error = %v, want %v", err, tt.wantErr)
 			}
@@ -120,23 +122,19 @@ func Test_valid(t *testing.T) {
 	tests := []struct {
 		name    string
 		ip      string
-		want    bool
 		wantErr error
 	}{
-		{"empty", "", false, ErrNoIP},
-		{"invalid", "abc", false, ErrInvalid},
-		{"ipv4", "1.1.1.1", true, nil},
-		{"ipv6", "0:0:0:0:0:FFFF:0101:0101", true, nil},
+		{"empty", "", ipify.ErrNoIP},
+		{"invalid", "abc", ipify.ErrInvalid},
+		{"ipv4", "1.1.1.1", nil},
+		{"ipv6", "0:0:0:0:0:FFFF:0101:0101", nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := valid(tt.ip)
+			err := ipify.Valid(tt.ip)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("valid() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if got != tt.want {
-				t.Errorf("valid() = %v, want %v", got, tt.want)
 			}
 		})
 	}
