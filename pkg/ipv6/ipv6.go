@@ -1,3 +1,6 @@
+// Package ipv4 requests your Internet-facing IPv6 address,
+// sourced from four different online APIs.
+// © Ben Garrett https://github.com/bengarrett/myip
 package ipv6
 
 import (

@@ -1,3 +1,6 @@
+// Package ping contains string functions for the
+// ipv4 and ipv6 packages.
+// © Ben Garrett https://github.com/bengarrett/myip
 package ping
 
 import (
