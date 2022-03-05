@@ -1,10 +1,12 @@
-package geolite2
+package geolite2_test
 
 import (
 	_ "embed"
 	"fmt"
 	"log"
 	"testing"
+
+	"github.com/bengarrett/myip/pkg/geolite2"
 )
 
 type jobs uint8
@@ -17,7 +19,7 @@ const (
 const example = "93.184.216.34"
 
 func BenchmarkCountry(b *testing.B) {
-	s, err := Country(example)
+	s, err := geolite2.Country(example)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -26,7 +28,7 @@ func BenchmarkCountry(b *testing.B) {
 }
 
 func BenchmarkCity(b *testing.B) {
-	s, err := City(example)
+	s, err := geolite2.City(example)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -35,7 +37,7 @@ func BenchmarkCity(b *testing.B) {
 }
 
 func ExampleCity() {
-	s, err := City("93.184.216.34")
+	s, err := geolite2.City("93.184.216.34")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +46,7 @@ func ExampleCity() {
 }
 
 func ExampleCountry() {
-	s, err := Country("93.184.216.34")
+	s, err := geolite2.Country("93.184.216.34")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,9 +75,9 @@ func TestLocations(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			switch tt.job {
 			case cities:
-				got, err = City(tt.ip)
+				got, err = geolite2.City(tt.ip)
 			case countries:
-				got, err = Country(tt.ip)
+				got, err = geolite2.Country(tt.ip)
 			}
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Locations() error = %v, wantErr %v", err, tt.wantErr)
