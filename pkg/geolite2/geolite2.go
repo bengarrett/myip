@@ -9,11 +9,14 @@ import (
 
 	// Embed GeoLite2 databases.
 	_ "embed"
+	"errors"
 	"fmt"
 	"net"
 
 	"github.com/oschwald/maxminddb-golang"
 )
+
+var ErrInvalid = errors.New("ip address is an invalid textual representation")
 
 const lang = "en"
 
@@ -32,6 +35,9 @@ func Country(ip string) (string, error) {
 	defer db.Close()
 
 	pip := net.ParseIP(ip)
+	if pip == nil {
+		return "", ErrInvalid
+	}
 
 	var record struct {
 		Country struct {
@@ -54,6 +60,9 @@ func City(ip string) (string, error) {
 	defer db.Close()
 
 	pip := net.ParseIP(ip)
+	if pip == nil {
+		return "", ErrInvalid
+	}
 
 	var record struct {
 		Country struct {
