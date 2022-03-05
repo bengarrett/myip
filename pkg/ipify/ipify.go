@@ -72,7 +72,7 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 	return ip, nil
 }
 
-// RequestB the ipify API and return the response body.
+// RequestB requests the ipify API and return the response body.
 func RequestB(ctx context.Context, cancel context.CancelFunc, url string) ([]byte, error) {
 	defer cancel()
 

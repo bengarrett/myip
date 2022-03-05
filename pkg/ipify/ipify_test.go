@@ -95,7 +95,7 @@ func TestError(t *testing.T) {
 	}
 }
 
-func Test_request(t *testing.T) {
+func TestRequestB(t *testing.T) {
 	tests := []struct {
 		name    string
 		domain  string
@@ -112,13 +112,13 @@ func Test_request(t *testing.T) {
 			ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
 			_, err := ipify.RequestB(ctx, timeout, tt.domain)
 			if err != nil && tt.wantErr != "" && !strings.Contains(fmt.Sprint(err), tt.wantErr) {
-				t.Errorf("request() error = %v, want %v", err, tt.wantErr)
+				t.Errorf("RequestB() error = %v, want %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func Test_valid(t *testing.T) {
+func TestValid(t *testing.T) {
 	tests := []struct {
 		name    string
 		ip      string
@@ -133,7 +133,7 @@ func Test_valid(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := ipify.Valid(tt.ip)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("valid() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Valid() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 		})

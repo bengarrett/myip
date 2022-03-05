@@ -43,24 +43,24 @@ var (
 
 const (
 	domain = "my-ip.io"
-	linkv4 = "https://api4.my-ip.io/ip.json"
-	linkv6 = "https://api6.my-ip.io/ip.json"
+	Linkv4 = "https://api4.my-ip.io/ip.json"
+	Linkv6 = "https://api6.my-ip.io/ip.json"
 )
 
 // IPv4 returns the clients online IP address.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	return Request(ctx, cancel, linkv4)
+	return Request(ctx, cancel, Linkv4)
 }
 
 // IPv6 returns the clients online IP address. Using this on a network
 // that does not support IPv6 will result in an error.
 func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	return Request(ctx, cancel, linkv6)
+	return Request(ctx, cancel, Linkv6)
 }
 
-// Request the seeip API URL and return a valid IPv4 or IPv6 address.
+// Request the myipcom API and return a valid IPv4 or IPv6 address.
 func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
-	r, err := request(ctx, cancel, url)
+	r, err := RequestR(ctx, cancel, url)
 	if r.IP == "" && err == nil && errors.Is(ctx.Err(), context.Canceled) {
 		return "", nil
 	}
@@ -79,14 +79,15 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 		return "", e
 	}
 
-	if ok, err := r.valid(url); !ok {
+	if err := r.Valid(url); err != nil {
 		return r.IP, err
 	}
 
 	return r.IP, nil
 }
 
-func request(ctx context.Context, cancel context.CancelFunc, url string) (Result, error) {
+// RequestR requests the myipcom API and return the parsed response body.
+func RequestR(ctx context.Context, cancel context.CancelFunc, url string) (Result, error) {
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -122,25 +123,26 @@ func parse(r io.Reader) (Result, error) {
 	return result, nil
 }
 
-func (r Result) valid(url string) (bool, error) {
+// Valid returns nil if url is a valid textual representation of an IP address.
+func (r Result) Valid(url string) error {
 	if r.IP == "" {
-		return false, ErrNoIP
+		return ErrNoIP
 	}
 
 	if !r.Success {
-		return false, ErrNoSuccess
+		return ErrNoSuccess
 	}
 
-	if url == linkv4 && !strings.EqualFold(r.Type, "ipv4") {
-		return false, ErrNoIPv4
+	if url == Linkv4 && !strings.EqualFold(r.Type, "ipv4") {
+		return ErrNoIPv4
 	}
-	if url == linkv6 && !strings.EqualFold(r.Type, "ipv6") {
-		return false, ErrNoIPv6
+	if url == Linkv6 && !strings.EqualFold(r.Type, "ipv6") {
+		return ErrNoIPv6
 	}
 
 	if net.ParseIP(r.IP) == nil {
-		return false, ErrInvalid
+		return ErrInvalid
 	}
 
-	return true, nil
+	return nil
 }
