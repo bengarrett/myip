@@ -1,4 +1,4 @@
-package myipio
+package myipcom_test
 
 import (
 	"context"
@@ -8,12 +8,14 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/bengarrett/myip/pkg/myipcom"
 )
 
 func BenchmarkRequest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-		s, err := request(ctx, timeout, linkv4)
+		s, err := myipcom.Request(ctx, timeout, myipcom.Link)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -27,7 +29,7 @@ func ExampleIPv4() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	s, err := IPv4(ctx, cancel)
+	s, err := myipcom.IPv4(ctx, cancel)
 	if err != nil {
 		log.Printf("\n%s\n", err)
 	}
@@ -46,7 +48,7 @@ func ExampleIPv6() {
 	s6 := make(chan string)
 
 	go func() {
-		s, err := IPv4(ctx4, cancel4)
+		s, err := myipcom.IPv4(ctx4, cancel4)
 		if err != nil {
 			log.Printf("\n%s\n", err)
 		}
@@ -54,7 +56,7 @@ func ExampleIPv6() {
 	}()
 
 	go func() {
-		s, err := IPv6(ctx6, cancel6)
+		s, err := myipcom.IPv6(ctx6, cancel6)
 		if err != nil {
 			log.Printf("\n%s\n", err)
 		}
@@ -69,7 +71,7 @@ func ExampleIPv6() {
 
 func TestTimeout(t *testing.T) {
 	ctx, timeout := context.WithTimeout(context.Background(), 0*time.Second)
-	if _, err := IPv4(ctx, timeout); !errors.Is(err, nil) {
+	if _, err := myipcom.IPv4(ctx, timeout); !errors.Is(err, nil) {
 		t.Errorf("IPv4() = %v, want %v", err, nil)
 	}
 }
@@ -77,9 +79,9 @@ func TestTimeout(t *testing.T) {
 func TestCancel(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	s, err := IPv4(ctx, cancel)
+	s, err := myipcom.IPv4(ctx, cancel)
 	if s != "" || err != nil {
-		t.Errorf("IPv4() s = %v, error = %v, want an empty string with no errors", s, err)
+		t.Errorf("IPv4() error = %v, want error string", err)
 	}
 	if want := context.Canceled; !errors.Is(ctx.Err(), want) {
 		t.Errorf("IPv4() context.error = %v, want %v", err, want)
@@ -88,12 +90,12 @@ func TestCancel(t *testing.T) {
 
 func TestError(t *testing.T) {
 	ctx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
-	if _, err := Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
+	if _, err := myipcom.Request(ctx, timeout, "invalid url"); errors.Is(err, nil) {
 		t.Errorf("Request() = %v, want an error", err)
 	}
 }
 
-func Test_request(t *testing.T) {
+func TestRequestS(t *testing.T) {
 	tests := []struct {
 		name    string
 		domain  string
@@ -102,57 +104,40 @@ func Test_request(t *testing.T) {
 	}{
 		{"empty", "", false, "unsupported protocol scheme"},
 		{"html", "https://example.com", false, "invalid character"},
-		{"404", "https://api4.my-ip.io/ip.json/abcdef", false, "404 not found"},
-		{"okay", "https://api4.my-ip.io/ip.json", true, ""},
+		{"404", "https://api.myip.com" + "/abcdef", false, "404 not found"},
+		{"okay", "https://api.myip.com", true, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-			gotS, err := request(ctx, timeout, tt.domain)
+			gotS, err := myipcom.RequestS(ctx, timeout, tt.domain)
 			if err != nil && tt.wantErr != "" && !strings.Contains(fmt.Sprint(err), tt.wantErr) {
-				t.Errorf("request() error = %v, want %v", err, tt.wantErr)
+				t.Errorf("RequestS() error = %v, want %v", err, tt.wantErr)
 			}
-			if bool(gotS.IP != "") != tt.isValid {
-				t.Errorf("request() = %v, want an ip addr: %v", gotS, tt.isValid)
+			if bool(gotS != "") != tt.isValid {
+				t.Errorf("RequestS() = %v, want an ip addr: %v", gotS, tt.isValid)
 			}
 		})
 	}
 }
 
-func TestResult_valid(t *testing.T) {
-	const addr = "1.1.1.1"
-	const ipv4 = "IPv4"
-	type fields struct {
-		Success bool
-		IP      string
-		Type    string
-	}
+func TestValid(t *testing.T) {
 	tests := []struct {
 		name    string
-		fields  fields
-		want    bool
+		ip      string
 		wantErr error
 	}{
-		{"no ip", fields{false, "", ipv4}, false, ErrNoIP},
-		{"fail", fields{false, addr, ipv4}, false, ErrNoSuccess},
-		{"not ipv4", fields{true, addr, "IPv6"}, false, ErrNoIPv4},
-		{"invalid", fields{true, "1", ipv4}, false, ErrInvalid},
-		{"valid", fields{true, addr, ipv4}, true, nil},
+		{"no ip", "", myipcom.ErrNoIP},
+		{"invalid", "1.1", myipcom.ErrInvalid},
+		{"ipv6", "2001:db8:8714:3a90::12", nil},
+		{"ipv4", "1.1.1.1", nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := Result{
-				Success: tt.fields.Success,
-				IP:      tt.fields.IP,
-				Type:    tt.fields.Type,
-			}
-			got, err := r.valid(linkv4)
+			err := myipcom.Valid(false, tt.ip)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("valid() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Valid() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if got != tt.want {
-				t.Errorf("valid() = %v, want %v", got, tt.want)
 			}
 		})
 	}

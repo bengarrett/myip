@@ -4,7 +4,6 @@
 *.dll
 *.so
 *.dylib
-myip
 
 # Test binary, built with `go test -c`
 *.test
@@ -18,3 +17,5 @@ vendor/
 
 # Operating system specific
 .DS_Store
+
+cmd/tray

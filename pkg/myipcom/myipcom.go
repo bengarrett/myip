@@ -39,12 +39,12 @@ var (
 
 const (
 	domain = "api.myip.com"
-	link   = "https://api.myip.com"
+	Link   = "https://api.myip.com"
 )
 
 // IPv4 returns the clients online IP address.
 func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	s, err := Request(ctx, cancel, link)
+	s, err := Request(ctx, cancel, Link)
 	if err != nil {
 		return s, err
 	}
@@ -53,7 +53,7 @@ func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 		return "", nil
 	}
 
-	if ok, err := valid(false, s); !ok {
+	if err := Valid(false, s); err != nil {
 		return s, err
 	}
 
@@ -63,7 +63,7 @@ func IPv4(ctx context.Context, cancel context.CancelFunc) (string, error) {
 // IPv6 returns the clients online IP address. Using this on a network
 // that does not support IPv6 will result in an error.
 func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
-	s, err := Request(ctx, cancel, link)
+	s, err := Request(ctx, cancel, Link)
 	if err != nil {
 		return s, err
 	}
@@ -72,16 +72,16 @@ func IPv6(ctx context.Context, cancel context.CancelFunc) (string, error) {
 		return "", nil
 	}
 
-	if ok, err := valid(true, s); !ok {
+	if err := Valid(true, s); err != nil {
 		return s, err
 	}
 
 	return s, nil
 }
 
-// Request the seeip API URL and return a valid IPv4 or IPv6 address.
+// Request the myipcom API and return a valid IPv4 or IPv6 address.
 func Request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
-	s, err := request(ctx, cancel, url)
+	s, err := RequestS(ctx, cancel, url)
 	if s == "" && err == nil && errors.Is(ctx.Err(), context.Canceled) {
 		return "", nil
 	}
@@ -103,7 +103,8 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 	return s, err
 }
 
-func request(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
+// RequestS requests the myipcom API and return the parsed response body.
+func RequestS(ctx context.Context, cancel context.CancelFunc, url string) (string, error) {
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -139,27 +140,27 @@ func parse(r io.Reader) (string, error) {
 	return result.IP, nil
 }
 
-func valid(ipv6 bool, s string) (bool, error) {
+// Valid returns nil if s is a valid textual representation of an IP address.
+func Valid(ipv6 bool, s string) error {
 	if s == "" {
-		return false, ErrNoIP
+		return ErrNoIP
 	}
 
 	ip := net.ParseIP(s)
 	if ip == nil {
-		return false, ErrInvalid
+		return ErrInvalid
 	}
 	if ipv6 && ip.To16() == nil {
-		return false, ErrNoIPv6
+		return ErrNoIPv6
 	}
 	if ipv6 && ip.To16().Equal(ip.To4()) {
-		return false, ErrNoIPv6
+		return ErrNoIPv6
 	}
 	if !ip.To16().Equal(ip.To4()) {
-		return true, nil
+		return nil
 	}
 	if ip.To4() == nil {
-		return false, ErrNoIPv4
+		return ErrNoIPv4
 	}
-
-	return true, nil
+	return nil
 }
