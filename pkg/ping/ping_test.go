@@ -2,6 +2,7 @@ package ping_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/bengarrett/myip/pkg/ping"
@@ -10,35 +11,39 @@ import (
 const (
 	example = "93.184.216.34"
 	norwell = "93.184.216.34, Norwell, United States"
-	timeout = 5000
 )
 
-//nolint:unparam
-func BenchmarkStd(b *testing.B) {
-	var p ping.Ping
-	p.Standard(timeout, false)
+func TestCity(t *testing.T) {
+	const ok = norwell
+	type fields struct {
+		Print   string
+		Results []string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		ip      string
+		want    string
+		wantErr bool
+	}{
+		{"empty", fields{}, "", "", true},
+		{"example", fields{}, example, ok, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ping.City(tt.ip)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("City() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("City() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
-//nolint:unparam
-func BenchmarkFirst(b *testing.B) {
-	var p ping.Ping
-	p.Request(timeout, false)
-}
-
-//nolint:unparam
-func BenchmarkSimple(b *testing.B) {
-	var p ping.Ping
-	p.Standard(timeout, false)
-}
-
-//nolint:unparam
-func BenchmarkSimpleAndFirst(b *testing.B) {
-	var p ping.Ping
-	p.Raw = true
-	p.Request(timeout, false)
-}
-
-func Test_Contains(t *testing.T) {
+func TestContains(t *testing.T) {
 	type args struct {
 		a []string
 		x string
@@ -63,91 +68,48 @@ func Test_Contains(t *testing.T) {
 	}
 }
 
-func Test_ping_Simple(t *testing.T) {
-	const ok = example
-	type fields struct {
-		Results []string
-		Print   string
-	}
+func TestSprint(t *testing.T) {
 	tests := []struct {
-		name   string
-		fields fields
-		ip     string
-		want   string
+		name string
+		ip   string
+		want string
 	}{
-		{"empty", fields{}, "", ""},
-		{"single ip", fields{}, example, example},
-		{"multiple ips", fields{[]string{"a", "b"}, ok}, example, fmt.Sprintf("%s. %s", ok, example)},
+		{"empty", "", ""},
+		{"invalid", "a.b.c.d", "(1/1) : invalid ip address"},
+		{"no geo-location", "0.0.0.0", "(1/1) 0.0.0.0"},
+		{"example", example, fmt.Sprintf("(1/1) %s", norwell)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := ping.Ping{
-				Results: tt.fields.Results,
-				Print:   tt.fields.Print,
-			}
-			if got := p.Simple(tt.ip); got != tt.want {
-				t.Errorf("ping.Simple() = %v, want %v", got, tt.want)
+			if got := strings.TrimSpace(ping.Sprint(tt.ip)); got != tt.want {
+				t.Errorf("Sprint() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_ping_City(t *testing.T) {
-	const ok = norwell
-	type fields struct {
-		Print   string
-		Results []string
+func TestSprints(t *testing.T) {
+	type args struct {
+		ip        string
+		completed int
+		raw       bool
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		ip      string
-		want    string
-		wantErr bool
+		name string
+		args args
+		want string
 	}{
-		{"empty", fields{}, "", "", true},
-		{"example", fields{}, example, ok, false},
-		{"examples", fields{Print: ok, Results: []string{"a", "b"}},
-			example, fmt.Sprintf("%s. %s", ok, ok), false},
+		{"empty", args{}, ""},
+		{"invalid", args{"a.b.c.d", 1, false}, "(1/4) a.b.c.d, invalid ip address"},
+		{"invalid raw", args{"a.b.c.d", 1, true}, "(1/4) a.b.c.d"},
+		{"no geo-location", args{"0.0.0.0", 2, false}, "(2/4) 0.0.0.0"},
+		{"example", args{example, 4, false}, fmt.Sprintf("(4/4) %s", norwell)},
+		{"example raw", args{example, 4, true}, fmt.Sprintf("(4/4) %s", example)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := ping.Ping{
-				Print:   tt.fields.Print,
-				Results: tt.fields.Results,
-			}
-			got, err := p.City(tt.ip)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ping.City() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("ping.City() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_ping_Parse(t *testing.T) {
-	type fields struct {
-		Print string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		ip     string
-		want   string
-	}{
-		{"empty", fields{}, "", ""},
-		{"ip", fields{}, example, fmt.Sprintf("\r(1/4) %s", norwell)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &ping.Ping{
-				Print: tt.fields.Print,
-			}
-			if got := p.Parse(tt.ip); got != tt.want {
-				t.Errorf("ping.Parse(%v) = %v, want %v", tt.ip, got, tt.want)
+			if got := strings.TrimSpace(ping.Sprints(tt.args.ip, tt.args.completed, tt.args.raw)); got != tt.want {
+				t.Errorf("Sprints() = %v, want %v", got, tt.want)
 			}
 		})
 	}

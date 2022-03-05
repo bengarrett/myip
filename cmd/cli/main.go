@@ -9,12 +9,15 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/bengarrett/myip/pkg/ipv4"
+	"github.com/bengarrett/myip/pkg/ipv6"
 	"github.com/bengarrett/myip/pkg/ping"
 )
 
 type modes struct {
 	first   bool
 	ipv6    bool
+	raw     bool
 	timeout int64
 }
 
@@ -36,13 +39,10 @@ func main() {
 		const second = 1000
 		return i / second
 	}
-	var (
-		mode modes
-		p    ping.Ping
-	)
+	var mode modes
 	flag.BoolVar(&mode.first, "first", false, "returns the first reported IP address and its location")
 	flag.BoolVar(&mode.ipv6, "ipv6", false, "return an IPv6 address instead of IPv4")
-	flag.BoolVar(&p.Raw, "simple", false, "simple mode only displays the IP address")
+	flag.BoolVar(&mode.raw, "simple", false, "simple mode only displays the IP address")
 	flag.Int64Var(&mode.timeout, "timeout", httpTimeout,
 		fmt.Sprintf("https request timeout in milliseconds (default: %d [%d seconds])", httpTimeout, msInSec(httpTimeout)))
 	ver := flag.Bool("version", false, "version and information for this program")
@@ -79,22 +79,66 @@ func main() {
 		mode.ipv6 = true
 	}
 	if *s {
-		p.Raw = true
+		mode.raw = true
 	}
 	if *t > 0 {
 		mode.timeout = *t
 	}
-	// first mode
-	if mode.first || *f {
+	if *f {
 		mode.first = true
-		fmt.Print(p.InitRequest())
-		r := p.Request(mode.timeout, mode.ipv6)
-		s := p.Parse(r) // rename to FmtRequest
+	}
+	switch mode.ipv6 {
+	case true:
+		mode.parseIPv6()
+	case false:
+		mode.parseIPv4()
+	}
+}
+
+func (m modes) parseIPv4() {
+	switch {
+	case m.first && m.raw:
+		ip := ipv4.One(m.timeout)
+		fmt.Println(ip)
+		return
+	case m.first:
+		fmt.Print(ping.Zero1)
+		ip := ipv4.One(m.timeout)
+		s := ping.Sprint(ip)
 		fmt.Println(s)
 		return
+	case m.raw:
+		ipv4.All(m.timeout, true)
+		fmt.Println()
+		return
+	default:
+		fmt.Print(ping.Zero)
+		ipv4.All(m.timeout, false)
+		fmt.Println()
 	}
-	// standard mode
-	p.Standard(mode.timeout, mode.ipv6)
+}
+
+func (m modes) parseIPv6() {
+	switch {
+	case m.first && m.raw:
+		ip := ipv6.One(m.timeout)
+		fmt.Println(ip)
+		return
+	case m.first:
+		fmt.Print(ping.Zero1)
+		ip := ipv6.One(m.timeout)
+		s := ping.Sprint(ip)
+		fmt.Println(s)
+		return
+	case m.raw:
+		ipv6.All(m.timeout, true)
+		fmt.Println()
+		return
+	default:
+		fmt.Print(ping.Zero)
+		ipv6.All(m.timeout, false)
+		fmt.Println()
+	}
 }
 
 func self() (string, error) {
@@ -108,7 +152,7 @@ func self() (string, error) {
 // Info prints out the program information and version.
 func info() {
 	const copyright = "\u00A9"
-	fmt.Printf("MyIP Tetrad v%s\n%s 2021 Ben Garrett\n", version, copyright)
+	fmt.Printf("MyIP Tetrad v%s\n%s 2021-22 Ben Garrett\n", version, copyright)
 	fmt.Printf("https://github.com/bengarrett/myip\n\n")
 	fmt.Printf("build: %s (%s)\n", commit, date)
 	exe, err := self()

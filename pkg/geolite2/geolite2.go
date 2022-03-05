@@ -21,10 +21,10 @@ var ErrInvalid = errors.New("ip address is an invalid textual representation")
 const lang = "en"
 
 //go:embed db/GeoLite2-Country/GeoLite2-Country.mmdb
-var country []byte // nolint:gochecknoglobals
+var country []byte
 
 //go:embed db/GeoLite2-City/GeoLite2-City.mmdb
-var city []byte // nolint:gochecknoglobals
+var city []byte
 
 func Country(ip string) (string, error) {
 	// use FromBytes() instead of Open("file.mmdb")
