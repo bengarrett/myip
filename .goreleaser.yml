@@ -8,27 +8,27 @@ before:
   hooks:
     - go mod tidy
 builds:
-  - main: ./cmd/myip/
+  - main: ./cmd/myip
     id: FreeBSD
     goos: ["freebsd"]
     goarch: ["amd64"]
 
-  - main: ./cmd/myip/
+  - main: ./cmd/myip
     id: Linux Intel
     goos: ["linux"]
     goarch: ["amd64"]
 
-  - main: ./cmd/myip/
+  - main: ./cmd/myip
     id: Linux arm
     goos: ["linux"]
     goarch: ["arm", "arm64"]
 
-  - main: ./cmd/myip/
+  - main: ./cmd/myip
     id: macOS
     goos: ["darwin"]
     goarch: ["amd64", "arm64"]
 
-  - main: ./cmd/myip/
+  - main: ./cmd/myip
     id: Windows
     goos: ["windows"]
     goarch: ["amd64"]
