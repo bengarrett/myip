@@ -1,12 +1,12 @@
 {
-    "version": "1.2.0",
+    "version": "1.2.2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/bengarrett/myip/releases/download/v1.2.0/myip_Windows_Intel.zip",
+            "url": "https://github.com/bengarrett/myip/releases/download/v1.2.2/myip_Windows_Intel.zip",
             "bin": [
                 "myip.exe"
             ],
-            "hash": "426eef1998e7bac75fa1becf81e8885ca6d763d22e56742f4ced60d71b1336f5"
+            "hash": "ef112a1ef1d1d2781742a1816ee9dbad7f5767549a55554174bf40a3d2d696a2"
         }
     },
     "homepage": "https://github.com/bengarrett/myip/",
