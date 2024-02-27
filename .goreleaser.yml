@@ -2,98 +2,74 @@
 #
 # test the config:
 # goreleaser check
-# goreleaser release --skip-publish --skip-validate --rm-dist
+# goreleaser release --skip=publish --skip=validate --clean
 
 before:
   hooks:
     - go mod tidy
+
 builds:
   - main: ./cmd/myip
     id: FreeBSD
     goos: ["freebsd"]
     goarch: ["amd64"]
-
   - main: ./cmd/myip
-    id: Linux Intel
+    id: Linux_Intel
     goos: ["linux"]
     goarch: ["amd64"]
-
   - main: ./cmd/myip
-    id: Linux arm
+    id: Linux_arm64
     goos: ["linux"]
     goarch: ["arm", "arm64"]
-
   - main: ./cmd/myip
     id: macOS
     goos: ["darwin"]
     goarch: ["amd64", "arm64"]
-
   - main: ./cmd/myip
     id: Windows
     goos: ["windows"]
     goarch: ["amd64"]
-
-archives:
-  - id: FreeBSD
-    builds: ["FreeBSD"]
-    format: tar.gz
-    files:
-      - none*
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      amd64: Intel
-      freebsd: FreeBSD
-  - id: Linux Intel
-    builds: ["Linux Intel"]
-    format: tar.gz
-    files:
-      - none*
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      amd64: Intel
-      linux: Linux
-  - id: Linux arm
-    builds: ["Linux arm"]
-    format: tar.gz
-    files:
-      - none*
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      arm: arm32_
-      arm64: arm64
-      linux: Linux
-  - id: macOS
-    builds: ["macOS"]
-    format: tar.gz
-    files:
-      - none*
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      arm64: M-series
-      amd64: Intel
-      darwin: macOS
-  - id: Windows
-    builds: ["Windows"]
-    format: zip
-    files:
-      - none*
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      amd64: Intel
-      windows: Windows
-
 universal_binaries:
   - id: macOS
     name_template: "{{ .ProjectName }}"
     replace: true
 
+archives:  
+  - id: FreeBSD
+    builds: ['BSD']
+    format: tar.gz
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+  - id: Linux_Intel
+    builds: ['Linux_Intel']
+    format: tar.gz
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+  - id: Linux_arm64
+    builds: ['Linux_arm64']
+    format: tar.gz
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+  - id: macOS
+    builds: ['macOS']
+    format: tar.gz
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+  - id: Windows
+    builds: ['Windows']
+    format: zip
+    files:
+    - none*
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
 nfpms:
   - id: Linux
-    builds: ["Linux Intel"]
+    builds: ['Linux_Intel']
     file_name_template: "{{ .ProjectName }}"
-    replacements:
-      amd64: Intel
-      linux: Linux
     vendor: Ben Garrett.
     homepage: https://github.com/bengarrett/myip
     maintainer: Ben Garrett <code.by.ben@gmail.com>
@@ -103,27 +79,4 @@ nfpms:
       - apk
       - deb
       - rpm
-
-scoop:
-  bucket:
-    owner: bengarrett
-    name: myip
-
-  commit_author:
-    name: goreleaserbot
-    email: goreleaser@carlosbecker.com
-
-  commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
-
-  homepage: "https://github.com/bengarrett/myip/"
-
-  description: "Determine your Internet-facing IP address and location from multiple sources."
-
-  license: MIT
-
-  # Setting this will prevent goreleaser to actually try to commit the updated
-  # manifest leaving the responsibility of publishing it to the user.
-  # If set to auto, the release will not be uploaded to the scoop bucket
-  # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
-  # Default is false.
-  skip_upload: auto
+      - archlinux
