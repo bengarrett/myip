@@ -9,34 +9,21 @@ It is an excellent tool for quickly determining if your machine or network is co
 
 ## Downloads
 
-[Windows](https://github.com/bengarrett/myip/releases/latest/download/myip_Windows_Intel.zip),
-[macOS](https://github.com/bengarrett/myip/releases/latest/download/myip_macOS_all.tar.gz),
-[Linux](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_Intel.tar.gz),
-[FreeBSD](https://github.com/bengarrett/myip/releases/latest/download/myip_FreeBSD_Intel.tar.gz),
-[Raspberry Pi](https://github.com/bengarrett/myip/releases/latest/download/myip_Linux_arm32_.tar.gz)
+[Windows](https://github.com/bengarrett/myip/releases/latest/download/myip_windows_amd64.zip),
+[macOS](https://github.com/bengarrett/myip/releases/latest/download/myip_darwin_all.tar.gz),
+[Linux](https://github.com/bengarrett/myip/releases/latest/download/myip_linux_amd64.tar.gz) and [more...](https://github.com/bengarrett/myip/releases/latest)
 
 ### Packages
-
-##### macOS [Homebrew](https://brew.sh/)
-
-```sh
-brew install bengarrett/myip/myip
-```
-
-##### Windows [Scoop](https://scoop.sh/)
-
-```sh
-scoop bucket add myip https://github.com/bengarrett/myip.git
-scoop install myip
-```
 
 [apk](https://github.com/bengarrett/myip/releases/latest/download/myip.apk) - Alpine package, [deb](https://github.com/bengarrett/myip/releases/latest/download/myip.deb) - Debian package, [rpm](https://github.com/bengarrett/myip/releases/latest/download/myip.rpm) - Redhat package
 
 ```sh
 # Alpine package
 apk add myip.apk
+
 # Debian package
 dpkg -i myip.deb
+
 # Redhat package
 rpm -i myip.rpm
 ```
