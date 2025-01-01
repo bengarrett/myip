@@ -4,6 +4,8 @@
 # goreleaser check
 # goreleaser release --skip=publish --skip=validate --clean
 
+version: 2
+
 before:
   hooks:
     - go mod tidy
@@ -34,7 +36,7 @@ universal_binaries:
     name_template: "{{ .ProjectName }}"
     replace: true
 
-archives:  
+archives:
   - id: FreeBSD
     builds: ['BSD']
     format: tar.gz
