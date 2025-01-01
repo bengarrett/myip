@@ -14,12 +14,12 @@ import (
 func BenchmarkRequest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-		r, err := seeip.RequestB(ctx, timeout, seeip.Linkv4)
+		p, err := seeip.RequestB(ctx, timeout, seeip.Linkv4)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		fmt.Println(string(r))
+		fmt.Println(string(p))
 	}
 }
 

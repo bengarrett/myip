@@ -15,12 +15,12 @@ import (
 func BenchmarkRequest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-		r, err := myipio.RequestR(ctx, timeout, myipio.Linkv4)
+		p, err := myipio.RequestR(ctx, timeout, myipio.Linkv4)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println(r)
+		fmt.Println(p)
 	}
 }
 

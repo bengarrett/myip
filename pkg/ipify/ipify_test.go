@@ -15,12 +15,12 @@ import (
 func BenchmarkRequest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ctx, timeout := context.WithTimeout(context.Background(), 5*time.Second)
-		b, err := ipify.RequestB(ctx, timeout, ipify.Linkv4)
+		p, err := ipify.RequestB(ctx, timeout, ipify.Linkv4)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println(string(b))
+		fmt.Println(string(p))
 	}
 }
 

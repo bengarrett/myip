@@ -75,7 +75,7 @@ func Request(ctx context.Context, cancel context.CancelFunc, url string) (string
 		if errors.Is(errors.Unwrap(err), context.Canceled) {
 			return "", nil
 		}
-		e := fmt.Errorf("%w: %s", ErrRequest, err)
+		e := fmt.Errorf("%w: %w", ErrRequest, err)
 		return "", e
 	}
 

@@ -54,7 +54,7 @@ func Sprint(ip string) string {
 		return fmt.Sprintf("\r(1/1) %s: %s", city, err)
 	}
 	// (1/1) 93.184.216.34, Norwell, United States
-	return fmt.Sprintf("\r(1/1) %s", city)
+	return "\r(1/1) " + city
 }
 
 // Sprint returns a formatted IP address for the All requests.

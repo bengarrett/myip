@@ -30,8 +30,8 @@ const (
 
 var (
 	version = "0.0.0"
-	commit  = "unset" // nolint: gochecknoglobals
-	date    = "unset" // nolint: gochecknoglobals
+	commit  = "unset" //nolint: gochecknoglobals
+	date    = "unset" //nolint: gochecknoglobals
 )
 
 func main() {

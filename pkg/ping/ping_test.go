@@ -1,7 +1,6 @@
 package ping_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -77,7 +76,7 @@ func TestSprint(t *testing.T) {
 		{"empty", "", ""},
 		{"invalid", "a.b.c.d", "(1/1) : invalid ip address"},
 		{"no geo-location", "0.0.0.0", "(1/1) 0.0.0.0"},
-		{"example", example, fmt.Sprintf("(1/1) %s", norwell)},
+		{"example", example, "(1/1) " + norwell},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -103,8 +102,8 @@ func TestSprints(t *testing.T) {
 		{"invalid", args{"a.b.c.d", 1, false}, "(1/4) a.b.c.d, invalid ip address"},
 		{"invalid raw", args{"a.b.c.d", 1, true}, "(1/4) a.b.c.d"},
 		{"no geo-location", args{"0.0.0.0", 2, false}, "(2/4) 0.0.0.0"},
-		{"example", args{example, 4, false}, fmt.Sprintf("(4/4) %s", norwell)},
-		{"example raw", args{example, 4, true}, fmt.Sprintf("(4/4) %s", example)},
+		{"example", args{example, 4, false}, "(4/4) " + norwell},
+		{"example raw", args{example, 4, true}, "(4/4) " + example},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

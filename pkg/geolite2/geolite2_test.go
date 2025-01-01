@@ -18,7 +18,7 @@ const (
 
 const example = "93.184.216.34"
 
-func BenchmarkCountry(b *testing.B) {
+func BenchmarkCountry(_ *testing.B) {
 	s, err := geolite2.Country(example)
 	if err != nil {
 		fmt.Println(err)
@@ -27,7 +27,7 @@ func BenchmarkCountry(b *testing.B) {
 	fmt.Println(s)
 }
 
-func BenchmarkCity(b *testing.B) {
+func BenchmarkCity(_ *testing.B) {
 	s, err := geolite2.City(example)
 	if err != nil {
 		fmt.Println(err)

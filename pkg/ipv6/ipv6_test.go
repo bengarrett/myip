@@ -10,14 +10,14 @@ import (
 
 const timeout = 5 * time.Second
 
-func BenchmarkAll(b *testing.B) {
+func BenchmarkAll(_ *testing.B) {
 	to := int64(timeout)
 	ipv6.All(to, false)
 	ipv6.All(to, true)
 	fmt.Println()
 }
 
-func BenchmarkOne(b *testing.B) {
+func BenchmarkOne(_ *testing.B) {
 	to := int64(timeout)
 	fmt.Println(ipv6.One(to))
 }

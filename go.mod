@@ -1,7 +1,9 @@
 module github.com/bengarrett/myip
 
-go 1.18
+go 1.21
 
-require github.com/oschwald/maxminddb-golang v1.12.0
+toolchain go1.23.4
 
-require golang.org/x/sys v0.17.0 // indirect
+require github.com/oschwald/maxminddb-golang v1.13.1
+
+require golang.org/x/sys v0.28.0 // indirect
