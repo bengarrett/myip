@@ -8,7 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strings"
@@ -91,7 +91,7 @@ func RequestB(ctx context.Context, cancel context.CancelFunc, url string) ([]byt
 		return nil, fmt.Errorf("%s, %w", strings.ToLower(resp.Status), ErrStatus)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

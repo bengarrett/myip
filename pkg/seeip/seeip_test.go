@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net"
 	"testing"
 	"time"
 
@@ -24,6 +25,7 @@ func BenchmarkRequest(b *testing.B) {
 }
 
 // ExampleIPv4 demonstrates an IPv4 address request with a 5 second timeout.
+// Output: true.
 func ExampleIPv4() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -32,7 +34,7 @@ func ExampleIPv4() {
 	if err != nil {
 		log.Printf("\n%s\n", err)
 	}
-	fmt.Println(s)
+	fmt.Println(net.ParseIP(s))
 }
 
 // ExampleIPv6 demonstrates cocurrent IPv4 and IPv6 address requests with a 5 second timeout.
